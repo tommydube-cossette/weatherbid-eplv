@@ -201,7 +201,7 @@
           <input type="text" id="cityCoords" value="Montréal, QC (45.5019, -73.5674)">
         </div>
       </div>
-      <div class="confidence-note">💡 Plan gratuit OpenWeatherMap = météo du jour + peu de granularité daily. Pour couvrir Thu→Sam/Dim de façon fiable, vise un plan avec "daily forecast" jusqu'à 4-5 jours (souvent le palier payant d'entrée, ~40$ USD/mois selon le volume d'appels).</div>
+      <div class="confidence-note">💡 Le plan gratuit (`/data/2.5/forecast`, sans carte de crédit) couvre un forecast par blocs de 3h sur 5 jours — largement suffisant pour "demain" et pour jeudi/vendredi qui regardent samedi/dimanche. Le script agrège lui-même les blocs 3h en une décision par jour.</div>
     </div>
   </section>
 
@@ -442,6 +442,9 @@ function generateScript(){
   const thuWeight = document.getElementById('thuWeight').value;
   const friWeight = document.getElementById('friWeight').value;
   const coords = document.getElementById('cityCoords').value;
+  const coordsMatch = coords.match(/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
+  const lat = coordsMatch ? coordsMatch[1] : "45.5019";
+  const lon = coordsMatch ? coordsMatch[2] : "-73.5674";
   const holdoutPct = document.getElementById('holdoutPct').value;
   const hardCap = document.getElementById('hardCap').value;
   const targetCooldown = document.getElementById('targetCooldown').value;
@@ -474,6 +477,8 @@ function generateScript(){
 
 const API_KEY = "COLLE_TA_CLE_ICI"; // ne jamais committer la clé en clair
 const LOCATION = "${coords}";
+const LOCATION_LAT = "${lat}";
+const LOCATION_LON = "${lon}";
 const WEEKEND_ANTICIPATION_ENABLED = ${weekend};
 const THURSDAY_CONFIDENCE_WEIGHT = ${thuWeight} / 100; // prévision J+2/J+3, plus incertaine
 const FRIDAY_CONFIDENCE_WEIGHT = ${friWeight} / 100;   // prévision J+1/J+2, plus fiable
@@ -538,15 +543,72 @@ function isBlackoutDate(date, periods) {
 }
 
 function getTomorrowForecast() {
-  // TODO: appel API forecast (daily), retourne { condition: 'rain'|'sun'|'neutral', tempC: number }
-  // Exemple structure de retour attendue par applyRuleToCampaigns()
-  return { condition: "neutral", tempC: 15 };
+  return getForecastForOffsetDay(1);
 }
 
 function getWeekendForecast(offsetDays) {
-  // TODO: appel API forecast daily à J+offsetDays et J+offsetDays+1, puis agréger
-  // (ex: pire cas des deux jours, ou moyenne — à décider selon la tolérance au risque)
-  return { condition: "neutral", tempC: 15 };
+  // Agrège samedi ET dimanche — on retient le "pire cas" pluie/beau temps entre les deux jours,
+  // pour être prudent sur les week-ends mixtes (samedi pluvieux, dimanche ensoleillé, etc.)
+  const day1 = getForecastForOffsetDay(offsetDays);
+  const day2 = getForecastForOffsetDay(offsetDays + 1);
+  return combineWorstCase(day1, day2);
+}
+
+function getForecastForOffsetDay(offsetDays) {
+  const url = "https://api.openweathermap.org/data/2.5/forecast" +
+    "?lat=" + LOCATION_LAT + "&lon=" + LOCATION_LON +
+    "&appid=" + API_KEY + "&units=metric";
+
+  const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  if (response.getResponseCode() !== 200) {
+    Logger.log("⚠️ Appel météo échoué (code " + response.getResponseCode() + ") — traité comme neutre, aucun ajustement.");
+    return { condition: "neutral", tempC: null };
+  }
+
+  const data = JSON.parse(response.getContentText());
+  const targetDate = new Date();
+  targetDate.setDate(targetDate.getDate() + offsetDays);
+  const targetIso = Utilities.formatDate(targetDate, "America/Montreal", "yyyy-MM-dd");
+
+  // On ne garde que les blocs 3h de la journée ciblée, entre 9h et 18h
+  // (heures d'ouverture typiques des musées — la météo de nuit n'influence pas la visite).
+  const relevantBlocks = data.list.filter(function(block) {
+    const blockIso = Utilities.formatDate(new Date(block.dt * 1000), "America/Montreal", "yyyy-MM-dd");
+    const hour = Number(Utilities.formatDate(new Date(block.dt * 1000), "America/Montreal", "H"));
+    return blockIso === targetIso && hour >= 9 && hour <= 18;
+  });
+
+  if (relevantBlocks.length === 0) {
+    Logger.log("⚠️ Aucun bloc météo trouvé pour " + targetIso + " (hors de la fenêtre 5 jours de l'API gratuite) — traité comme neutre.");
+    return { condition: "neutral", tempC: null };
+  }
+
+  // Condition dominante: si au moins un bloc annonce de la pluie sur la plage 9h-18h, on considère "rain".
+  const hasRain = relevantBlocks.some(function(b) {
+    const main = b.weather[0].main.toLowerCase();
+    return main.indexOf("rain") > -1 || main.indexOf("drizzle") > -1 || main.indexOf("thunderstorm") > -1;
+  });
+  const avgTemp = relevantBlocks.reduce(function(sum, b) { return sum + b.main.temp; }, 0) / relevantBlocks.length;
+
+  let condition = "neutral";
+  if (hasRain) {
+    condition = "rain";
+  } else if (avgTemp >= 20) {
+    condition = "sun";
+  }
+
+  return { condition: condition, tempC: Math.round(avgTemp * 10) / 10 };
+}
+
+function combineWorstCase(day1, day2) {
+  // "Pire cas" pour une campagne sensible à la pluie: si un des deux jours a de la pluie, on traite le week-end comme pluvieux.
+  if (day1.condition === "rain" || day2.condition === "rain") {
+    return { condition: "rain", tempC: Math.min(day1.tempC || 99, day2.tempC || 99) };
+  }
+  if (day1.condition === "sun" && day2.condition === "sun") {
+    return { condition: "sun", tempC: Math.max(day1.tempC || 0, day2.tempC || 0) };
+  }
+  return { condition: "neutral", tempC: (day1.tempC + day2.tempC) / 2 };
 }
 
 function applyRuleToCampaigns(rule, forecast, confidenceWeight) {
