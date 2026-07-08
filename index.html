@@ -1,0 +1,732 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weather Bid Command Center — Espace pour la vie</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --yellow:#FFEE00;
+    --navy:#0B1B2B;
+    --navy-soft:#132A42;
+    --paper:#F5F3EE;
+    --rain:#3E6FE0;
+    --sun:#2D8C6B;
+    --alert:#E8542C;
+    --ink:#0B1B2B;
+    --ink-60: rgba(11,27,43,0.6);
+    --line: rgba(11,27,43,0.12);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background: var(--navy);
+    color: var(--paper);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+  }
+  .wrap{max-width:1100px;margin:0 auto;padding:48px 24px 80px;}
+
+  header.hero{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom:2px solid var(--yellow);
+    padding-bottom:28px; margin-bottom:36px;
+    flex-wrap:wrap; gap:16px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:.12em;
+    color:var(--yellow); text-transform:uppercase; margin:0 0 8px;
+  }
+  h1{
+    font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:38px;
+    margin:0; line-height:1.05; color:#fff;
+  }
+  h1 span{color:var(--yellow);}
+  .hero-sub{max-width:420px; font-size:14px; color:rgba(245,243,238,0.7); line-height:1.5;}
+
+  .radar{
+    display:flex; gap:6px; margin-top:14px;
+  }
+  .radar-day{
+    width:38px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px;
+  }
+  .radar-dot{
+    width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);
+    display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:4px;
+    background:rgba(255,255,255,0.04);
+  }
+  .radar-day.lookahead .radar-dot{border-color:var(--yellow); background:rgba(255,238,0,0.08);}
+  .radar-day.target .radar-dot{border-style:dashed; border-color:var(--rain);}
+  .radar-label{color:rgba(245,243,238,0.55);}
+  .radar-day.lookahead .radar-label{color:var(--yellow);}
+  .radar-bracket{
+    font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--yellow);
+    text-align:center; margin-top:4px;
+  }
+
+  section{margin-bottom:40px;}
+  .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:16px;}
+  .section-num{
+    font-family:'JetBrains Mono',monospace; color:var(--yellow); font-size:13px;
+  }
+  h2{font-family:'Space Grotesk',sans-serif; font-size:20px; margin:0; color:#fff; font-weight:600;}
+  .section-desc{font-size:13px; color:rgba(245,243,238,0.55); margin:6px 0 0; max-width:620px;}
+
+  .card{
+    background: var(--navy-soft); border:1px solid rgba(255,255,255,0.08);
+    border-radius:6px; padding:24px;
+  }
+
+  label{display:block; font-size:12px; color:rgba(245,243,238,0.6); margin-bottom:6px; font-family:'JetBrains Mono',monospace;}
+  input[type=text], input[type=password], input[type=number], select{
+    width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15);
+    color:#fff; padding:9px 10px; border-radius:4px; font-size:13px; font-family:'Inter',sans-serif;
+  }
+  input:focus, select:focus{outline:2px solid var(--yellow); outline-offset:1px;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+  .field{margin-bottom:14px;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{
+    text-align:left; font-family:'JetBrains Mono',monospace; font-weight:500; font-size:11px;
+    color:rgba(245,243,238,0.5); padding:8px 8px; border-bottom:1px solid rgba(255,255,255,0.12);
+    text-transform:uppercase; letter-spacing:.04em;
+  }
+  td{padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:middle;}
+  td input, td select{padding:6px 8px; font-size:12px;}
+  .tag{
+    display:inline-block; font-size:10px; font-family:'JetBrains Mono',monospace; padding:2px 7px;
+    border-radius:10px; text-transform:uppercase;
+  }
+  .tag.sun{background:rgba(45,140,107,0.2); color:#6FCBA3;}
+  .tag.rain{background:rgba(62,111,224,0.2); color:#8FB0F5;}
+  .row-add{
+    background:transparent; border:1px dashed rgba(255,255,255,0.25); color:rgba(245,243,238,0.7);
+    padding:8px 14px; font-size:12px; border-radius:4px; cursor:pointer; font-family:'JetBrains Mono',monospace;
+    margin-top:12px;
+  }
+  .row-add:hover{border-color:var(--yellow); color:var(--yellow);}
+  .del-btn{background:none;border:none;color:var(--alert);cursor:pointer;font-size:16px;line-height:1;padding:0 4px;}
+
+  .toggle-row{display:flex; align-items:center; gap:12px; margin-bottom:16px;}
+  .switch{position:relative; width:42px; height:22px; flex-shrink:0;}
+  .switch input{opacity:0; width:0; height:0;}
+  .slider{position:absolute; inset:0; background:rgba(255,255,255,0.2); border-radius:22px; cursor:pointer; transition:.2s;}
+  .slider:before{content:"";position:absolute;width:16px;height:16px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s;}
+  input:checked + .slider{background:var(--yellow);}
+  input:checked + .slider:before{transform:translateX(20px); background:var(--navy);}
+  .toggle-label{font-size:13px; color:#fff;}
+  .toggle-sub{font-size:12px; color:rgba(245,243,238,0.5);}
+
+  .confidence-note{
+    font-size:12px; color:rgba(245,243,238,0.6); background:rgba(255,238,0,0.06);
+    border-left:2px solid var(--yellow); padding:10px 14px; margin-top:12px; line-height:1.5;
+  }
+
+  .btn-primary{
+    background:var(--yellow); color:var(--navy); border:none; padding:12px 22px;
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px; border-radius:4px;
+    cursor:pointer;
+  }
+  .btn-primary:hover{background:#fff;}
+  .btn-secondary{
+    background:transparent; color:var(--paper); border:1px solid rgba(255,255,255,0.25);
+    padding:11px 20px; font-family:'JetBrains Mono',monospace; font-size:12px; border-radius:4px;
+    cursor:pointer; margin-left:10px;
+  }
+  .btn-secondary:hover{border-color:var(--yellow); color:var(--yellow);}
+
+  pre{
+    background:#08131F; border:1px solid rgba(255,255,255,0.1); border-radius:6px;
+    padding:20px; font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1.6;
+    overflow-x:auto; max-height:480px; overflow-y:auto; color:#D6E8FF; margin-top:16px;
+  }
+  .checklist{list-style:none; margin:0; padding:0;}
+  .checklist li{
+    display:flex; gap:10px; font-size:13px; color:rgba(245,243,238,0.8); padding:9px 0;
+    border-bottom:1px solid rgba(255,255,255,0.06); line-height:1.5;
+  }
+  .checklist li:last-child{border-bottom:none;}
+  .checklist .num{color:var(--yellow); font-family:'JetBrains Mono',monospace; font-size:12px; flex-shrink:0;}
+
+  footer{
+    margin-top:60px; padding-top:20px; border-top:1px solid rgba(255,255,255,0.1);
+    font-size:11px; color:rgba(245,243,238,0.35); font-family:'JetBrains Mono',monospace;
+  }
+  @media (max-width:640px){
+    .grid2,.grid3{grid-template-columns:1fr;}
+    h1{font-size:28px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Signal QC · Module indépendant</p>
+      <h1>Weather Bid <span>Command Center</span></h1>
+      <p class="hero-sub">Ajustement automatisé des enchères Google Ads selon la météo — construit pour Espace pour la vie (Biodôme, Planétarium, Jardin botanique).</p>
+    </div>
+    <div>
+      <p class="eyebrow" style="text-align:right;">Radar week-end</p>
+      <div class="radar" id="radarStrip"></div>
+      <p class="radar-bracket" id="radarBracket"></p>
+    </div>
+  </header>
+
+  <!-- SECTION 1 -->
+  <section>
+    <div class="section-head"><span class="section-num">01</span><h2>Source météo</h2></div>
+    <p class="section-desc">Le script interroge les prévisions (forecast), pas la météo en temps réel — c'est la prévision qui pilote une décision prise 1 à 2 jours à l'avance.</p>
+    <div class="card">
+      <div class="grid3">
+        <div class="field">
+          <label>Fournisseur</label>
+          <select id="provider">
+            <option value="owm">OpenWeatherMap (forecast)</option>
+            <option value="msc">Environnement Canada — MSC GeoMet</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Clé API</label>
+          <input type="password" id="apiKey" placeholder="••••••••••••••">
+        </div>
+        <div class="field">
+          <label>Ville / coordonnées</label>
+          <input type="text" id="cityCoords" value="Montréal, QC (45.5019, -73.5674)">
+        </div>
+      </div>
+      <div class="confidence-note">💡 Plan gratuit OpenWeatherMap = météo du jour + peu de granularité daily. Pour couvrir Thu→Sam/Dim de façon fiable, vise un plan avec "daily forecast" jusqu'à 4-5 jours (souvent le palier payant d'entrée, ~40$ USD/mois selon le volume d'appels).</div>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section>
+    <div class="section-head"><span class="section-num">02</span><h2>Matrice campagnes × météo</h2></div>
+    <p class="section-desc">Une ligne par campagne (ou groupe de musées). Le sens de la sensibilité détermine si le budget/target monte ou descend selon la condition.</p>
+    <div class="card">
+      <table id="matrixTable">
+        <thead>
+          <tr>
+            <th style="width:20%">Musée / campagne</th>
+            <th style="width:16%">Filtre nom (contient)</th>
+            <th style="width:14%">Sensibilité</th>
+            <th style="width:14%">Type d'ajustement</th>
+            <th style="width:12%">Palier froid/pluie</th>
+            <th style="width:12%">Palier beau temps</th>
+            <th style="width:8%">PMax?</th>
+            <th style="width:4%"></th>
+          </tr>
+        </thead>
+        <tbody id="matrixBody"></tbody>
+      </table>
+      <button class="row-add" id="addRow">+ ajouter une campagne</button>
+    </div>
+  </section>
+
+  <!-- SECTION 3 -->
+  <section>
+    <div class="section-head"><span class="section-num">03</span><h2>Anticipation week-end</h2></div>
+    <p class="section-desc">Le conseil clé : la décision d'aller au musée se prend souvent le jeudi ou le vendredi. Le script regarde alors la météo de samedi/dimanche, pas celle du jour même.</p>
+    <div class="card">
+      <div class="toggle-row">
+        <label class="switch"><input type="checkbox" id="weekendToggle" checked><span class="slider"></span></label>
+        <div>
+          <div class="toggle-label">Activer l'ajustement anticipé jeudi/vendredi</div>
+          <div class="toggle-sub">Jeudi → prévision Sam+Dim (ajustement prudent) · Vendredi → prévision Sam+Dim mise à jour (ajustement plus marqué)</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Poids de confiance — jeudi (J+2/J+3)</label>
+          <input type="number" id="thuWeight" value="60" min="0" max="100"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% de l'ajustement normal</span>
+        </div>
+        <div class="field">
+          <label>Poids de confiance — vendredi (J+1/J+2)</label>
+          <input type="number" id="friWeight" value="90" min="0" max="100"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% de l'ajustement normal</span>
+        </div>
+      </div>
+      <div class="confidence-note">Une prévision à J+3 est statistiquement moins fiable qu'à J+1 — d'où le poids réduit le jeudi, resserré le vendredi quand la prévision se précise.</div>
+    </div>
+  </section>
+
+  <!-- SECTION 4 -->
+  <section>
+    <div class="section-head"><span class="section-num">04</span><h2>Garde-fous — pour trouver l'harmonie</h2></div>
+    <p class="section-desc">Sans ça, impossible de prouver l'incrémentalité, et le Smart Bidding peut rester en apprentissage permanent. Rien ne s'active dans le script sans ces paramètres.</p>
+    <div class="card">
+      <div class="grid3">
+        <div class="field">
+          <label>Groupe témoin (hold-out)</label>
+          <input type="number" id="holdoutPct" value="15" min="0" max="50"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% des campagnes exclues du script, pour prouver l'incrémentalité</span>
+        </div>
+        <div class="field">
+          <label>Plafond dur de l'ajustement</label>
+          <input type="number" id="hardCap" value="40" min="5" max="100"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% max, peu importe le calcul — évite l'emballement</span>
+        </div>
+        <div class="field">
+          <label>Délai min. entre 2 changements de target</label>
+          <input type="number" id="targetCooldown" value="7" min="1" max="30"> <span style="font-size:11px;color:rgba(245,243,238,.5)">jours — protège la stabilité Smart Bidding (Target CPA/ROAS)</span>
+        </div>
+      </div>
+      <div class="field">
+        <label>Dates / périodes d'exclusion — jours fériés, vacances scolaires, événements spéciaux (ex: Jardins de lumière)</label>
+        <table id="blackoutTable">
+          <thead>
+            <tr>
+              <th style="width:32%">Événement / raison</th>
+              <th style="width:24%">Date de début</th>
+              <th style="width:24%">Date de fin (optionnel)</th>
+              <th style="width:6%"></th>
+            </tr>
+          </thead>
+          <tbody id="blackoutBody"></tbody>
+        </table>
+        <button class="row-add" id="addBlackout">+ ajouter une exclusion</button>
+      </div>
+      <div class="confidence-note">Sur ces dates, le script ne fait <b>rien</b> — la demande y est pilotée par l'événement, pas par la météo, donc le signal serait faux.</div>
+      <div class="field" style="margin-top:14px;">
+        <label>Google Sheet de journal (optionnel — pour un rapport client lisible)</label>
+        <input type="text" id="logSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/...">
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 5 -->
+  <section>
+    <div class="section-head"><span class="section-num">05</span><h2>Générer le Google Ads Script</h2></div>
+    <p class="section-desc">Le script est pensé pour tourner tôt le matin (avant 6-7h) via le planificateur natif de Google Ads Scripts — pas dans ce fichier — pour que les baisses de budget prennent effet avant que la plateforme n'ait dépensé au maximum de la journée.</p>
+    <div class="card">
+      <button class="btn-primary" id="genBtn">Générer le script</button>
+      <button class="btn-secondary" id="copyBtn">Copier</button>
+      <pre id="scriptOut">// Configure la matrice ci-dessus, puis clique "Générer le script".</pre>
+    </div>
+  </section>
+
+  <!-- SECTION 6 -->
+  <section>
+    <div class="section-head"><span class="section-num">06</span><h2>Avant d'activer — checklist Alexandre</h2></div>
+    <div class="card">
+      <ul class="checklist">
+        <li><span class="num">01</span>Vérifier la stratégie d'enchères de chaque campagne (Target CPA/ROAS = ajuster le target ; enchère manuelle = ajuster le budget) avant d'activer.</li>
+        <li><span class="num">02</span>Les baisses de budget doivent être poussées la veille au soir ou tôt le matin — sinon Google Ads dépense le montant max déjà atteint dans la journée.</li>
+        <li><span class="num">03</span>Sur PMax : pas de contrôle par mot-clé, mais le budget de campagne et le tROAS/tCPA restent ajustables via l'API — impact moins granulaire, à documenter dans le rapport client.</li>
+        <li><span class="num">04</span>Documenter chaque seuil ($ ou %) avant le lancement — Alexandre veut la matrice complète en main avant l'ETA.</li>
+        <li><span class="num">05</span>Garder un groupe témoin (hold-out) actif dès le jour 1 — sans lui, impossible de prouver que le script génère de la performance incrémentale plutôt que de suivre une demande qui serait arrivée pareil.</li>
+        <li><span class="num">06</span>Exclure les jours fériés, vacances scolaires et événements spéciaux (Jardins de lumière, etc.) — la météo n'y explique pas la demande, le signal serait faux.</li>
+        <li><span class="num">07</span>Espacer les changements de target CPA/ROAS (cooldown) — des changements trop fréquents remettent l'algorithme Smart Bidding en apprentissage permanent.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>SEM Command Center — Module Weather Bid Adjuster · Cossette Media · Tommy Dubé</footer>
+</div>
+
+<script>
+const SENSITIVITY = { sun: 'Augmente au beau temps', rain: 'Augmente à la pluie' };
+let rows = [
+  { name:'Jardin botanique', filter:'Jardin', sens:'sun', adjType:'budget', coldVal:'-25%', sunVal:'+30%', pmax:'oui' },
+  { name:'Biodôme', filter:'Biodome', sens:'rain', adjType:'budget', coldVal:'+30%', sunVal:'-20%', pmax:'oui' },
+  { name:'Planétarium', filter:'Planetarium', sens:'rain', adjType:'target', coldVal:'+20%', sunVal:'-15%', pmax:'non' },
+];
+
+let blackouts = [
+  { label:'Jardins de lumière', start:'2026-12-01', end:'2027-01-11' },
+  { label:'Fête du Travail', start:'2026-09-07', end:'' },
+];
+
+function renderBlackouts(){
+  const body = document.getElementById('blackoutBody');
+  body.innerHTML = blackouts.map((b,i)=>`
+    <tr data-i="${i}">
+      <td><input type="text" value="${b.label}" data-f="label" placeholder="ex: Congé scolaire"></td>
+      <td><input type="date" value="${b.start}" data-f="start"></td>
+      <td><input type="date" value="${b.end}" data-f="end"></td>
+      <td><button class="del-btn" data-del="${i}">✕</button></td>
+    </tr>
+  `).join('');
+
+  body.querySelectorAll('input').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const tr = e.target.closest('tr');
+      const i = +tr.dataset.i;
+      blackouts[i][e.target.dataset.f] = e.target.value;
+    });
+  });
+  body.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      blackouts.splice(+e.target.dataset.del, 1);
+      renderBlackouts();
+    });
+  });
+}
+
+document.getElementById('addBlackout').addEventListener('click', ()=>{
+  blackouts.push({ label:'', start:'', end:'' });
+  renderBlackouts();
+});
+
+function renderRadar(){
+  const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  const strip = document.getElementById('radarStrip');
+  strip.innerHTML = days.map((d,i)=>{
+    const isLookahead = (d==='Jeu' || d==='Ven');
+    const isTarget = (d==='Sam' || d==='Dim');
+    const icon = isTarget ? '☀' : (isLookahead ? '👁' : '·');
+    return `<div class="radar-day ${isLookahead?'lookahead':''} ${isTarget?'target':''}">
+      <div class="radar-dot">${icon}</div>
+      <div class="radar-label">${d}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('radarBracket').textContent = 'Jeu/Ven regardent Sam+Dim →';
+}
+
+function renderMatrix(){
+  const body = document.getElementById('matrixBody');
+  body.innerHTML = rows.map((r,i)=>`
+    <tr data-i="${i}">
+      <td><input type="text" value="${r.name}" data-f="name"></td>
+      <td><input type="text" value="${r.filter}" data-f="filter"></td>
+      <td>
+        <select data-f="sens">
+          <option value="sun" ${r.sens==='sun'?'selected':''}>☀ ${SENSITIVITY.sun}</option>
+          <option value="rain" ${r.sens==='rain'?'selected':''}>🌧 ${SENSITIVITY.rain}</option>
+        </select>
+      </td>
+      <td>
+        <select data-f="adjType">
+          <option value="budget" ${r.adjType==='budget'?'selected':''}>Budget campagne</option>
+          <option value="target" ${r.adjType==='target'?'selected':''}>Target CPA/ROAS</option>
+        </select>
+      </td>
+      <td><input type="text" value="${r.coldVal}" data-f="coldVal" placeholder="ex: +30% ou 150$"></td>
+      <td><input type="text" value="${r.sunVal}" data-f="sunVal" placeholder="ex: -20%"></td>
+      <td>
+        <select data-f="pmax">
+          <option value="oui" ${r.pmax==='oui'?'selected':''}>Oui</option>
+          <option value="non" ${r.pmax==='non'?'selected':''}>Non</option>
+        </select>
+      </td>
+      <td><button class="del-btn" data-del="${i}">✕</button></td>
+    </tr>
+  `).join('');
+
+  body.querySelectorAll('input,select').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const tr = e.target.closest('tr');
+      const i = +tr.dataset.i;
+      rows[i][e.target.dataset.f] = e.target.value;
+    });
+  });
+  body.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      rows.splice(+e.target.dataset.del, 1);
+      renderMatrix();
+    });
+  });
+}
+
+document.getElementById('addRow').addEventListener('click', ()=>{
+  rows.push({ name:'Nouvelle campagne', filter:'', sens:'sun', adjType:'budget', coldVal:'-10%', sunVal:'+10%', pmax:'non' });
+  renderMatrix();
+});
+
+function generateScript(){
+  const provider = document.getElementById('provider').value;
+  const weekend = document.getElementById('weekendToggle').checked;
+  const thuWeight = document.getElementById('thuWeight').value;
+  const friWeight = document.getElementById('friWeight').value;
+  const coords = document.getElementById('cityCoords').value;
+  const holdoutPct = document.getElementById('holdoutPct').value;
+  const hardCap = document.getElementById('hardCap').value;
+  const targetCooldown = document.getElementById('targetCooldown').value;
+  const blackoutRaw = blackouts
+    .filter(b => b.start)
+    .map(b => b.end ? (b.start + ":" + b.end) : b.start);
+  const logSheetUrl = document.getElementById('logSheetUrl').value.trim();
+
+  const matrixJs = rows.map(r=>`  {
+    name: "${r.name}",
+    campaignNameContains: "${r.filter}",
+    sensitivity: "${r.sens}", // 'sun' = augmente au beau temps, 'rain' = augmente à la pluie
+    adjustmentType: "${r.adjType}", // 'budget' ou 'target'
+    coldOrRainValue: "${r.coldVal}",
+    sunValue: "${r.sunVal}",
+    isPMax: ${r.pmax === 'oui'}
+  }`).join(',\n');
+
+  const script = `/**
+ * Weather Bid Adjuster — Espace pour la vie
+ * Généré par le Weather Bid Command Center (module Signal QC)
+ * Fournisseur météo: ${provider === 'owm' ? 'OpenWeatherMap' : 'Environnement Canada MSC GeoMet'}
+ * Coordonnées: ${coords}
+ *
+ * ⚠️ À PLANIFIER via le scheduler natif de Google Ads Scripts, tôt le matin (5h-7h),
+ *    AVANT que Google Ads calcule la dépense max de la journée.
+ *    Une baisse de budget appliquée en cours de journée n'a aucun effet rétroactif
+ *    sur le plafond déjà atteint.
+ */
+
+const API_KEY = "COLLE_TA_CLE_ICI"; // ne jamais committer la clé en clair
+const LOCATION = "${coords}";
+const WEEKEND_ANTICIPATION_ENABLED = ${weekend};
+const THURSDAY_CONFIDENCE_WEIGHT = ${thuWeight} / 100; // prévision J+2/J+3, plus incertaine
+const FRIDAY_CONFIDENCE_WEIGHT = ${friWeight} / 100;   // prévision J+1/J+2, plus fiable
+
+// --- GARDE-FOUS (l'harmonie) ---
+const HOLDOUT_PERCENTAGE = ${holdoutPct};   // % de campagnes gardées comme groupe témoin, jamais touchées
+const HARD_CAP_PERCENT = ${hardCap};        // plafond dur, peu importe le calcul (évite l'emballement)
+const TARGET_CHANGE_COOLDOWN_DAYS = ${targetCooldown}; // délai min. entre 2 changements de target (stabilité Smart Bidding)
+const BLACKOUT_PERIODS = ${JSON.stringify(blackoutRaw)}; // jours fériés / vacances / événements — aucun ajustement météo là-dessus
+// Référence lisible: ${blackouts.filter(b=>b.start).map(b=>`${b.label||'(sans nom)'} → ${b.start}${b.end?' à '+b.end:''}`).join(' · ')}
+const LOG_SHEET_URL = "${logSheetUrl}"; // optionnel: URL d'une Google Sheet pour un journal exploitable par le client
+
+const CAMPAIGN_RULES = [
+${matrixJs}
+];
+
+function main() {
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0=Dim ... 4=Jeu, 5=Ven
+
+  // --- Garde-fou: blackout (fériés, vacances, événements type Jardins de lumière) ---
+  if (isBlackoutDate(today, BLACKOUT_PERIODS)) {
+    Logger.log("📅 Date en période d'exclusion — aucun ajustement météo appliqué aujourd'hui.");
+    return;
+  }
+
+  let forecast;
+  let confidenceWeight = 1;
+
+  if (WEEKEND_ANTICIPATION_ENABLED && dayOfWeek === 4) {
+    // Jeudi: on regarde la météo de samedi + dimanche
+    forecast = getWeekendForecast(2); // offset +2 jours = samedi
+    confidenceWeight = THURSDAY_CONFIDENCE_WEIGHT;
+    Logger.log("Mode anticipation JEUDI — prévision week-end, poids " + confidenceWeight);
+  } else if (WEEKEND_ANTICIPATION_ENABLED && dayOfWeek === 5) {
+    // Vendredi: prévision week-end mise à jour, plus fiable
+    forecast = getWeekendForecast(1); // offset +1 jour = samedi
+    confidenceWeight = FRIDAY_CONFIDENCE_WEIGHT;
+    Logger.log("Mode anticipation VENDREDI — prévision week-end, poids " + confidenceWeight);
+  } else {
+    // Jour normal: météo prévue pour demain
+    forecast = getTomorrowForecast();
+    confidenceWeight = 1;
+  }
+
+  Logger.log("Condition retenue: " + JSON.stringify(forecast));
+
+  CAMPAIGN_RULES.forEach(function(rule) {
+    applyRuleToCampaigns(rule, forecast, confidenceWeight);
+  });
+}
+
+function isBlackoutDate(date, periods) {
+  const iso = Utilities.formatDate(date, "America/Montreal", "yyyy-MM-dd");
+  return periods.some(function(p) {
+    if (p.indexOf(":") > -1) {
+      const parts = p.split(":");
+      return iso >= parts[0].trim() && iso <= parts[1].trim();
+    }
+    return iso === p.trim();
+  });
+}
+
+function getTomorrowForecast() {
+  // TODO: appel API forecast (daily), retourne { condition: 'rain'|'sun'|'neutral', tempC: number }
+  // Exemple structure de retour attendue par applyRuleToCampaigns()
+  return { condition: "neutral", tempC: 15 };
+}
+
+function getWeekendForecast(offsetDays) {
+  // TODO: appel API forecast daily à J+offsetDays et J+offsetDays+1, puis agréger
+  // (ex: pire cas des deux jours, ou moyenne — à décider selon la tolérance au risque)
+  return { condition: "neutral", tempC: 15 };
+}
+
+function applyRuleToCampaigns(rule, forecast, confidenceWeight) {
+  const iterator = AdsApp.campaigns()
+    .withCondition("Name CONTAINS '" + rule.campaignNameContains + "'")
+    .get();
+
+  while (iterator.hasNext()) {
+    const campaign = iterator.next();
+
+    try {
+      // --- Garde-fou: groupe témoin (hold-out) ---
+      // Assignation déterministe par ID de campagne (stable d'un jour à l'autre, pas aléatoire à chaque run)
+      if (isInHoldoutGroup(campaign.getId(), HOLDOUT_PERCENTAGE)) {
+        Logger.log("🔬 " + campaign.getName() + " = groupe témoin (hold-out) — aucun ajustement, sert de comparatif.");
+        logAction(campaign.getName(), "HOLDOUT", "-", "-", forecast.condition);
+        continue;
+      }
+
+      // --- Vérification stratégie d'enchères (checklist Alexandre #1) ---
+      const biddingStrategyType = campaign.getBiddingStrategyType();
+      if (rule.adjustmentType === "target" &&
+          biddingStrategyType !== "TARGET_CPA" &&
+          biddingStrategyType !== "TARGET_ROAS") {
+        Logger.log("⚠️ " + campaign.getName() + " : stratégie '" + biddingStrategyType +
+          "' incompatible avec un ajustement de target. Passer en ajustement budget ou ignorer.");
+        continue;
+      }
+
+      // --- PMax (checklist Alexandre #3) ---
+      if (rule.isPMax) {
+        Logger.log(campaign.getName() + " est une campagne PMax — ajustement limité au budget/target de campagne (pas de granularité mot-clé).");
+      }
+
+      const goesUp = (rule.sensitivity === "sun" && forecast.condition === "sun") ||
+                     (rule.sensitivity === "rain" && forecast.condition === "rain");
+      const goesDown = (rule.sensitivity === "sun" && forecast.condition === "rain") ||
+                        (rule.sensitivity === "rain" && forecast.condition === "sun");
+
+      let rawValue = null;
+      if (goesUp) rawValue = rule.sensitivity === "sun" ? rule.sunValue : rule.coldOrRainValue;
+      if (goesDown) rawValue = rule.sensitivity === "sun" ? rule.coldOrRainValue : rule.sunValue;
+      if (!rawValue) continue; // condition neutre, aucun ajustement
+
+      let weightedAdjustment = applyConfidenceWeight(rawValue, confidenceWeight);
+      weightedAdjustment = applyHardCap(weightedAdjustment, HARD_CAP_PERCENT);
+
+      if (rule.adjustmentType === "budget") {
+        adjustCampaignBudget(campaign, weightedAdjustment, forecast.condition);
+      } else {
+        // --- Garde-fou: cooldown avant de retoucher un target (stabilité Smart Bidding) ---
+        if (!isTargetCooldownElapsed(campaign, TARGET_CHANGE_COOLDOWN_DAYS)) {
+          Logger.log("⏳ " + campaign.getName() + " : cooldown target actif (< " + TARGET_CHANGE_COOLDOWN_DAYS + " jours depuis le dernier changement) — ignoré aujourd'hui.");
+          continue;
+        }
+        adjustCampaignTarget(campaign, weightedAdjustment, biddingStrategyType, forecast.condition);
+      }
+    } catch (e) {
+      // --- Garde-fou: échec silencieux = ne RIEN faire, jamais de valeur par défaut dangereuse ---
+      Logger.log("🛑 Erreur sur " + campaign.getName() + " — aucun changement appliqué. Détail: " + e.message);
+    }
+  }
+}
+
+function isInHoldoutGroup(campaignId, pct) {
+  if (pct <= 0) return false;
+  // Hash simple et stable de l'ID -> bucket 0-99, pour que le même sous-ensemble
+  // de campagnes reste le groupe témoin d'un jour à l'autre (comparaison valide).
+  const idStr = String(campaignId);
+  let hash = 0;
+  for (let i = 0; i < idStr.length; i++) {
+    hash = (hash * 31 + idStr.charCodeAt(i)) % 100000;
+  }
+  return (hash % 100) < pct;
+}
+
+function applyHardCap(rawValue, capPct) {
+  if (rawValue.indexOf("%") === -1) return rawValue; // valeurs $ fixes non plafonnées ici
+  const num = parseFloat(rawValue);
+  const capped = Math.max(Math.min(num, capPct), -capPct);
+  return (capped >= 0 ? "+" : "") + capped.toFixed(1) + "%";
+}
+
+function isTargetCooldownElapsed(campaign, cooldownDays) {
+  // Utilise un label horodaté sur la campagne comme mémoire simple entre exécutions.
+  const labelPrefix = "weather-target-updated:";
+  const labels = campaign.labels().get();
+  let lastUpdate = null;
+  while (labels.hasNext()) {
+    const label = labels.next().getName();
+    if (label.indexOf(labelPrefix) === 0) {
+      lastUpdate = new Date(label.replace(labelPrefix, ""));
+    }
+  }
+  if (!lastUpdate) return true; // jamais ajusté -> ok d'y aller
+  const daysSince = (new Date() - lastUpdate) / (1000 * 60 * 60 * 24);
+  return daysSince >= cooldownDays;
+}
+
+function stampTargetCooldown(campaign) {
+  const labelPrefix = "weather-target-updated:";
+  const iso = Utilities.formatDate(new Date(), "America/Montreal", "yyyy-MM-dd");
+  const labelName = labelPrefix + iso;
+  if (!AdsApp.labels().withCondition("Name = '" + labelName + "'").get().hasNext()) {
+    AdsApp.createLabel(labelName);
+  }
+  campaign.applyLabel(labelName);
+}
+
+function logAction(campaignName, action, oldVal, newVal, condition) {
+  Logger.log([new Date().toISOString(), campaignName, action, oldVal, newVal, condition].join(" | "));
+  // Si LOG_SHEET_URL est configuré, on pousse aussi une ligne dans la Sheet pour un rapport client lisible.
+  if (LOG_SHEET_URL) {
+    try {
+      const sheet = SpreadsheetApp.openByUrl(LOG_SHEET_URL).getSheetByName("Log") ||
+                    SpreadsheetApp.openByUrl(LOG_SHEET_URL).insertSheet("Log");
+      sheet.appendRow([new Date(), campaignName, action, oldVal, newVal, condition]);
+    } catch (e) {
+      Logger.log("Log Sheet inaccessible — log conservé dans Logger.log seulement.");
+    }
+  }
+}
+
+function applyConfidenceWeight(rawValue, weight) {
+  // Un ajustement "+30%" avec un poids de confiance de 0.6 devient "+18%"
+  if (rawValue.indexOf("%") > -1) {
+    const num = parseFloat(rawValue) * weight;
+    return (num >= 0 ? "+" : "") + num.toFixed(1) + "%";
+  }
+  return rawValue; // valeurs en $ fixes: appliquées telles quelles (à raffiner si besoin)
+}
+
+function adjustCampaignBudget(campaign, adjustment, condition) {
+  const currentBudget = campaign.getBudget().getAmount();
+  let newBudget = currentBudget;
+  if (adjustment.indexOf("%") > -1) {
+    const pct = parseFloat(adjustment) / 100;
+    newBudget = currentBudget * (1 + pct);
+  } else {
+    newBudget = parseFloat(adjustment.replace("$", ""));
+  }
+  campaign.getBudget().setAmount(newBudget);
+  logAction(campaign.getName(), "BUDGET", currentBudget.toFixed(2), newBudget.toFixed(2), condition);
+}
+
+function adjustCampaignTarget(campaign, adjustment, biddingStrategyType, condition) {
+  const pct = parseFloat(adjustment) / 100;
+  if (biddingStrategyType === "TARGET_CPA") {
+    const current = campaign.bidding().getStrategy().getTargetCpa();
+    const updated = current * (1 + pct);
+    campaign.bidding().getStrategy().setTargetCpa(updated);
+    logAction(campaign.getName(), "TARGET_CPA", current.toFixed(2), updated.toFixed(2), condition);
+    stampTargetCooldown(campaign);
+  } else if (biddingStrategyType === "TARGET_ROAS") {
+    const current = campaign.bidding().getStrategy().getTargetRoas();
+    const updated = current * (1 + pct); // attention: sens inverse pour ROAS selon l'objectif métier
+    campaign.bidding().getStrategy().setTargetRoas(updated);
+    logAction(campaign.getName(), "TARGET_ROAS", current.toFixed(3), updated.toFixed(3), condition);
+    stampTargetCooldown(campaign);
+  }
+}
+`;
+
+  document.getElementById('scriptOut').textContent = script;
+}
+
+document.getElementById('genBtn').addEventListener('click', generateScript);
+document.getElementById('copyBtn').addEventListener('click', ()=>{
+  const text = document.getElementById('scriptOut').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn = document.getElementById('copyBtn');
+    const old = btn.textContent;
+    btn.textContent = 'Copié ✓';
+    setTimeout(()=>btn.textContent = old, 1500);
+  });
+});
+
+renderRadar();
+renderMatrix();
+renderBlackouts();
+</script>
+</body>
+</html>
