@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weather Bid Command Center — Espace pour la vie</title>
+<title>Weather Bid Command Center v2 : Espace pour la vie</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -17,10 +17,11 @@
     --sun:#2D8C6B;
     --alert:#E8542C;
     --ink:#0B1B2B;
-    --ink-60: rgba(11,27,43,0.6);
     --line: rgba(11,27,43,0.12);
   }
   *{box-sizing:border-box;}
+  html{color-scheme:dark;}
+  select option{background:#132A42; color:#fff;}
   body{
     margin:0;
     background: var(--navy);
@@ -28,7 +29,7 @@
     font-family:'Inter',sans-serif;
     min-height:100vh;
   }
-  .wrap{max-width:1100px;margin:0 auto;padding:48px 24px 80px;}
+  .wrap{max-width:1150px;margin:0 auto;padding:48px 24px 80px;}
 
   header.hero{
     display:flex; justify-content:space-between; align-items:flex-end;
@@ -45,14 +46,15 @@
     margin:0; line-height:1.05; color:#fff;
   }
   h1 span{color:var(--yellow);}
-  .hero-sub{max-width:420px; font-size:14px; color:rgba(245,243,238,0.7); line-height:1.5;}
+  .hero-sub{max-width:460px; font-size:14px; color:rgba(245,243,238,0.7); line-height:1.5;}
+  .version-tag{
+    display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px;
+    background:rgba(255,238,0,0.12); color:var(--yellow); padding:2px 8px; border-radius:10px;
+    margin-left:10px; vertical-align:middle; letter-spacing:.08em;
+  }
 
-  .radar{
-    display:flex; gap:6px; margin-top:14px;
-  }
-  .radar-day{
-    width:38px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px;
-  }
+  .radar{display:flex; gap:6px; margin-top:14px;}
+  .radar-day{width:38px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px;}
   .radar-dot{
     width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.25);
     display:flex;align-items:center;justify-content:center;font-size:16px;margin-bottom:4px;
@@ -69,11 +71,9 @@
 
   section{margin-bottom:40px;}
   .section-head{display:flex; align-items:baseline; gap:10px; margin-bottom:16px;}
-  .section-num{
-    font-family:'JetBrains Mono',monospace; color:var(--yellow); font-size:13px;
-  }
+  .section-num{font-family:'JetBrains Mono',monospace; color:var(--yellow); font-size:13px;}
   h2{font-family:'Space Grotesk',sans-serif; font-size:20px; margin:0; color:#fff; font-weight:600;}
-  .section-desc{font-size:13px; color:rgba(245,243,238,0.55); margin:6px 0 0; max-width:620px;}
+  .section-desc{font-size:13px; color:rgba(245,243,238,0.55); margin:6px 0 0; max-width:680px;}
 
   .card{
     background: var(--navy-soft); border:1px solid rgba(255,255,255,0.08);
@@ -81,29 +81,24 @@
   }
 
   label{display:block; font-size:12px; color:rgba(245,243,238,0.6); margin-bottom:6px; font-family:'JetBrains Mono',monospace;}
-  input[type=text], input[type=password], input[type=number], select{
+  input[type=text], input[type=password], input[type=number], input[type=date], select{
     width:100%; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.15);
     color:#fff; padding:9px 10px; border-radius:4px; font-size:13px; font-family:'Inter',sans-serif;
   }
   input:focus, select:focus{outline:2px solid var(--yellow); outline-offset:1px;}
   .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
   .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;}
+  .grid4{display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:16px;}
   .field{margin-bottom:14px;}
 
   table{width:100%; border-collapse:collapse; font-size:13px;}
   th{
-    text-align:left; font-family:'JetBrains Mono',monospace; font-weight:500; font-size:11px;
-    color:rgba(245,243,238,0.5); padding:8px 8px; border-bottom:1px solid rgba(255,255,255,0.12);
-    text-transform:uppercase; letter-spacing:.04em;
+    text-align:left; font-family:'JetBrains Mono',monospace; font-weight:500; font-size:10.5px;
+    color:rgba(245,243,238,0.5); padding:8px 6px; border-bottom:1px solid rgba(255,255,255,0.12);
+    text-transform:uppercase; letter-spacing:.03em;
   }
-  td{padding:6px 8px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:middle;}
+  td{padding:6px 5px; border-bottom:1px solid rgba(255,255,255,0.06); vertical-align:middle;}
   td input, td select{padding:6px 8px; font-size:12px;}
-  .tag{
-    display:inline-block; font-size:10px; font-family:'JetBrains Mono',monospace; padding:2px 7px;
-    border-radius:10px; text-transform:uppercase;
-  }
-  .tag.sun{background:rgba(45,140,107,0.2); color:#6FCBA3;}
-  .tag.rain{background:rgba(62,111,224,0.2); color:#8FB0F5;}
   .row-add{
     background:transparent; border:1px dashed rgba(255,255,255,0.25); color:rgba(245,243,238,0.7);
     padding:8px 14px; font-size:12px; border-radius:4px; cursor:pointer; font-family:'JetBrains Mono',monospace;
@@ -126,6 +121,10 @@
     font-size:12px; color:rgba(245,243,238,0.6); background:rgba(255,238,0,0.06);
     border-left:2px solid var(--yellow); padding:10px 14px; margin-top:12px; line-height:1.5;
   }
+  .warn-note{
+    font-size:12px; color:#FFC9A8; background:rgba(232,84,44,0.08);
+    border-left:2px solid var(--alert); padding:10px 14px; margin-top:12px; line-height:1.5;
+  }
 
   .btn-primary{
     background:var(--yellow); color:var(--navy); border:none; padding:12px 22px;
@@ -139,6 +138,9 @@
     cursor:pointer; margin-left:10px;
   }
   .btn-secondary:hover{border-color:var(--yellow); color:var(--yellow);}
+  #genStatus{font-size:12px; font-family:'JetBrains Mono',monospace; margin-top:10px; line-height:1.6;}
+  #genStatus .ok{color:#6FCBA3;}
+  #genStatus .warn{color:#FFC9A8;}
 
   pre{
     background:#08131F; border:1px solid rgba(255,255,255,0.1); border-radius:6px;
@@ -158,7 +160,7 @@
     font-size:11px; color:rgba(245,243,238,0.35); font-family:'JetBrains Mono',monospace;
   }
   @media (max-width:640px){
-    .grid2,.grid3{grid-template-columns:1fr;}
+    .grid2,.grid3,.grid4{grid-template-columns:1fr;}
     h1{font-size:28px;}
   }
 </style>
@@ -169,8 +171,8 @@
   <header class="hero">
     <div>
       <p class="eyebrow">Signal QC · Module indépendant</p>
-      <h1>Weather Bid <span>Command Center</span></h1>
-      <p class="hero-sub">Ajustement automatisé des enchères Google Ads selon la météo — construit pour Espace pour la vie (Biodôme, Planétarium, Jardin botanique).</p>
+      <h1>Weather Bid <span>Command Center</span><span class="version-tag">V2 : AUDITÉ</span></h1>
+      <p class="hero-sub">Ajustement automatisé des enchères Google Ads selon la météo, construit pour Espace pour la vie (Biodôme, Planétarium, Jardin botanique, Biosphère). V2 : ajustements calculés depuis une valeur de base (fini la dérive), support PMax réel, neige et froid détectés, rotation créative météo.</p>
     </div>
     <div>
       <p class="eyebrow" style="text-align:right;">Radar week-end</p>
@@ -181,44 +183,74 @@
 
   <!-- SECTION 1 -->
   <section>
-    <div class="section-head"><span class="section-num">01</span><h2>Source météo</h2></div>
-    <p class="section-desc">Le script interroge les prévisions (forecast), pas la météo en temps réel — c'est la prévision qui pilote une décision prise 1 à 2 jours à l'avance.</p>
+    <div class="section-head"><span class="section-num">01</span><h2>Source météo et seuils</h2></div>
+    <p class="section-desc">Le script interroge les prévisions (forecast), pas la météo en temps réel : c'est la prévision qui pilote une décision prise 1 à 2 jours à l'avance. Les seuils définissent ce qui compte comme "beau temps" et "froid".</p>
     <div class="card">
       <div class="grid3">
         <div class="field">
           <label>Fournisseur</label>
           <select id="provider">
             <option value="owm">OpenWeatherMap (forecast)</option>
-            <option value="msc">Environnement Canada — MSC GeoMet</option>
+            <option value="msc" disabled>Environnement Canada MSC GeoMet (a venir)</option>
           </select>
         </div>
         <div class="field">
-          <label>Clé API</label>
-          <input type="password" id="apiKey" placeholder="••••••••••••••">
+          <label>Clé API (injectée dans le script généré)</label>
+          <input type="password" id="apiKey" placeholder="Collée UNE fois, elle vit ensuite dans le script planifié">
         </div>
         <div class="field">
-          <label>Ville / coordonnées</label>
-          <input type="text" id="cityCoords" value="Montréal, QC (45.5019, -73.5674)">
+          <label>Ville (préréglages ou personnalisé)</label>
+          <select id="citySelect">
+            <option value="45.5019|-73.5674|Montréal, QC" selected>Montréal, QC (Espace pour la vie)</option>
+            <option value="46.8131|-71.2075|Québec, QC">Québec, QC</option>
+            <option value="45.6066|-73.7124|Laval, QC">Laval, QC</option>
+            <option value="45.4765|-75.7013|Gatineau, QC">Gatineau, QC</option>
+            <option value="45.4042|-71.8929|Sherbrooke, QC">Sherbrooke, QC</option>
+            <option value="46.3432|-72.5430|Trois-Rivières, QC">Trois-Rivières, QC</option>
+            <option value="custom">Coordonnées personnalisées...</option>
+          </select>
         </div>
       </div>
-      <div class="confidence-note">💡 Le plan gratuit (`/data/2.5/forecast`, sans carte de crédit) couvre un forecast par blocs de 3h sur 5 jours — largement suffisant pour "demain" et pour jeudi/vendredi qui regardent samedi/dimanche. Le script agrège lui-même les blocs 3h en une décision par jour.</div>
+      <div class="grid2">
+        <div class="field">
+          <label>Latitude</label>
+          <input type="number" id="latInput" value="45.5019" step="0.0001" min="-90" max="90">
+        </div>
+        <div class="field">
+          <label>Longitude</label>
+          <input type="number" id="lonInput" value="-73.5674" step="0.0001" min="-180" max="180">
+        </div>
+      </div>
+      <div class="confidence-note">Choisir une ville remplit les coordonnées automatiquement. Les modifier à la main passe en mode personnalisé. Les coordonnées déterminent QUELLE météo pilote les enchères : mauvaise ville = mauvaises décisions. Pour trouver des coordonnées précises : clic droit sur Google Maps, le premier chiffre est la latitude. Si la ville change plus tard : la changer ici, régénérer, et remplacer le code du script dans Google Ads (ou modifier directement LOCATION_LAT / LOCATION_LON dans le script planifié).</div>
+      <div class="grid2">
+        <div class="field">
+          <label>Seuil beau temps (temp. moyenne 9h-18h, en °C)</label>
+          <input type="number" id="warmTemp" value="20" min="-10" max="40"> <span style="font-size:11px;color:rgba(245,243,238,.5)">au-dessus, sans pluie = condition "beau temps"</span>
+        </div>
+        <div class="field">
+          <label>Seuil froid (temp. moyenne 9h-18h, en °C)</label>
+          <input type="number" id="coldTemp" value="5" min="-30" max="20"> <span style="font-size:11px;color:rgba(245,243,238,.5)">en dessous = traité comme "froid/pluie" (plan B intérieur)</span>
+        </div>
+      </div>
+      <div class="confidence-note">💡 Le plan gratuit (/data/2.5/forecast, sans carte de crédit) couvre un forecast par blocs de 3h sur 5 jours : suffisant pour "demain" et pour jeudi/vendredi qui regardent samedi/dimanche. V2 : la neige, la bruine et les orages comptent maintenant comme "pluie" (essentiel pour l'hiver montréalais), et une journée sèche mais glaciale est traitée comme mauvais temps extérieur.</div>
     </div>
   </section>
 
   <!-- SECTION 2 -->
   <section>
     <div class="section-head"><span class="section-num">02</span><h2>Matrice campagnes × météo</h2></div>
-    <p class="section-desc">Une ligne par campagne (ou groupe de musées). Le sens de la sensibilité détermine si le budget/target monte ou descend selon la condition.</p>
+    <p class="section-desc">Une ligne par campagne (ou groupe de musées). NOUVEAU V2 : la colonne "Valeur de base" est la référence fixe (budget quotidien en $ ou target). Chaque ajustement est calculé depuis cette base, jamais depuis la valeur courante : aucun effet cumulatif possible, et retour automatique à la base en condition neutre.</p>
     <div class="card">
       <table id="matrixTable">
         <thead>
           <tr>
-            <th style="width:20%">Musée / campagne</th>
-            <th style="width:16%">Filtre nom (contient)</th>
+            <th style="width:15%">Musée / campagne</th>
+            <th style="width:12%">Filtre nom (contient)</th>
             <th style="width:14%">Sensibilité</th>
-            <th style="width:14%">Type d'ajustement</th>
-            <th style="width:12%">Palier froid/pluie</th>
-            <th style="width:12%">Palier beau temps</th>
+            <th style="width:13%">Type d'ajustement</th>
+            <th style="width:11%">Valeur de base</th>
+            <th style="width:11%">Palier froid/pluie</th>
+            <th style="width:11%">Palier beau temps</th>
             <th style="width:8%">PMax?</th>
             <th style="width:4%"></th>
           </tr>
@@ -226,6 +258,7 @@
         <tbody id="matrixBody"></tbody>
       </table>
       <button class="row-add" id="addRow">+ ajouter une campagne</button>
+      <div class="confidence-note">La valeur de base est OBLIGATOIRE : sans elle, le script ignore la ligne (fail-safe, jamais de devinette). Une ligne couvre UN type de campagne : pour un musée qui a du Search ET du PMax, créer deux lignes avec le même filtre (une PMax = Oui, une PMax = Non). Budget = budget quotidien de référence en $. Target = tCPA en $ ou tROAS dans l'unité affichée par Google Ads. Attention au sens pour un tROAS : monter le tROAS rend l'enchère PLUS restrictive, donc un "push" pluie sur une campagne tROAS = palier négatif.</div>
     </div>
   </section>
 
@@ -243,21 +276,21 @@
       </div>
       <div class="grid2">
         <div class="field">
-          <label>Poids de confiance — jeudi (J+2/J+3)</label>
+          <label>Poids de confiance : jeudi (J+2/J+3)</label>
           <input type="number" id="thuWeight" value="60" min="0" max="100"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% de l'ajustement normal</span>
         </div>
         <div class="field">
-          <label>Poids de confiance — vendredi (J+1/J+2)</label>
+          <label>Poids de confiance : vendredi (J+1/J+2)</label>
           <input type="number" id="friWeight" value="90" min="0" max="100"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% de l'ajustement normal</span>
         </div>
       </div>
-      <div class="confidence-note">Une prévision à J+3 est statistiquement moins fiable qu'à J+1 — d'où le poids réduit le jeudi, resserré le vendredi quand la prévision se précise.</div>
+      <div class="confidence-note">Une prévision à J+3 est statistiquement moins fiable qu'à J+1, d'où le poids réduit le jeudi, resserré le vendredi quand la prévision se précise. V2 : le jour de la semaine est calculé dans le fuseau America/Montreal (et non celui des serveurs Google en Pacifique), et si un des jours ciblés (samedi/dimanche) tombe dans une période d'exclusion, aucun ajustement budget/target n'est appliqué.</div>
     </div>
   </section>
 
   <!-- SECTION 4 -->
   <section>
-    <div class="section-head"><span class="section-num">04</span><h2>Garde-fous — pour trouver l'harmonie</h2></div>
+    <div class="section-head"><span class="section-num">04</span><h2>Garde-fous : pour trouver l'harmonie</h2></div>
     <p class="section-desc">Sans ça, impossible de prouver l'incrémentalité, et le Smart Bidding peut rester en apprentissage permanent. Rien ne s'active dans le script sans ces paramètres.</p>
     <div class="card">
       <div class="grid3">
@@ -267,15 +300,15 @@
         </div>
         <div class="field">
           <label>Plafond dur de l'ajustement</label>
-          <input type="number" id="hardCap" value="40" min="5" max="100"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% max, peu importe le calcul — évite l'emballement</span>
+          <input type="number" id="hardCap" value="40" min="5" max="100"> <span style="font-size:11px;color:rgba(245,243,238,.5)">% max, peu importe le calcul : évite l'emballement</span>
         </div>
         <div class="field">
           <label>Délai min. entre 2 changements de target</label>
-          <input type="number" id="targetCooldown" value="7" min="1" max="30"> <span style="font-size:11px;color:rgba(245,243,238,.5)">jours — protège la stabilité Smart Bidding (Target CPA/ROAS)</span>
+          <input type="number" id="targetCooldown" value="7" min="1" max="30"> <span style="font-size:11px;color:rgba(245,243,238,.5)">jours : protège la stabilité Smart Bidding (Target CPA/ROAS)</span>
         </div>
       </div>
       <div class="field">
-        <label>Dates / périodes d'exclusion — jours fériés, vacances scolaires, événements spéciaux (ex: Jardins de lumière)</label>
+        <label>Dates / périodes d'exclusion : jours fériés, vacances scolaires, événements spéciaux (ex: Jardins de lumière)</label>
         <table id="blackoutTable">
           <thead>
             <tr>
@@ -289,92 +322,129 @@
         </table>
         <button class="row-add" id="addBlackout">+ ajouter une exclusion</button>
       </div>
-      <div class="confidence-note">Sur ces dates, le script ne fait <b>rien</b> — la demande y est pilotée par l'événement, pas par la météo, donc le signal serait faux.</div>
-      <div class="field" style="margin-top:14px;">
-        <label>Google Sheet de journal (optionnel — pour un rapport client lisible)</label>
-        <input type="text" id="logSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/...">
+      <div class="confidence-note">Sur ces dates, le script ne fait <b>rien</b> : la demande y est pilotée par l'événement, pas par la météo, donc le signal serait faux. V2 : l'exclusion s'applique aussi aux jours CIBLÉS par la prévision (ex: si samedi est férié, le jeudi n'ajuste pas les budgets en fonction de la météo de samedi).</div>
+      <div class="grid2" style="margin-top:14px;">
+        <div class="field">
+          <label>Google Sheet de journal (optionnel : pour un rapport client lisible)</label>
+          <input type="text" id="logSheetUrl" placeholder="https://docs.google.com/spreadsheets/d/...">
+        </div>
+        <div class="field">
+          <label>Courriel de notification (optionnel : résumé quand le script agit)</label>
+          <input type="text" id="notifyEmail" placeholder="tommy.dube@cossette.com">
+        </div>
       </div>
+      <div class="confidence-note">Hold-out manuel en plus du % automatique : applique le libellé <b>wb-holdout</b> sur n'importe quelle campagne pour la sortir définitivement du script (utile sur un petit compte où le % par hash peut tomber sur 0 ou 1 campagne au hasard).</div>
     </div>
   </section>
 
-  <!-- SECTION 5 -->
+  <!-- SECTION 5 : NOUVEAU -->
   <section>
-    <div class="section-head"><span class="section-num">05</span><h2>Générer le Google Ads Script</h2></div>
-    <p class="section-desc">Le script est pensé pour tourner tôt le matin (avant 6-7h) via le planificateur natif de Google Ads Scripts — pas dans ce fichier — pour que les baisses de budget prennent effet avant que la plateforme n'ait dépensé au maximum de la journée.</p>
+    <div class="section-head"><span class="section-num">05</span><h2>Créatifs météo (nouveau)</h2></div>
+    <p class="section-desc">Fait alterner les annonces (Search) et les asset groups (PMax) selon la météo du JOUR MÊME. Le message suit la réalité du visiteur ("Il pleut? Parfait pour le Biodôme"), pendant que les budgets, eux, anticipent la demande.</p>
     <div class="card">
-      <button class="btn-primary" id="genBtn">Générer le script</button>
-      <button class="btn-secondary" id="copyBtn">Copier</button>
-      <pre id="scriptOut">// Configure la matrice ci-dessus, puis clique "Générer le script".</pre>
+      <div class="toggle-row">
+        <label class="switch"><input type="checkbox" id="creativeToggle"><span class="slider"></span></label>
+        <div>
+          <div class="toggle-label">Activer la rotation créative météo</div>
+          <div class="toggle-sub">DÉSACTIVÉ par défaut : implique des pauses/activations automatiques d'annonces, à valider avec Melissa/Alexandre avant production (doctrine anti auto-pause)</div>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Libellé des annonces "pluie" (Search)</label>
+          <input type="text" id="rainAdLabel" value="meteo-pluie">
+        </div>
+        <div class="field">
+          <label>Libellé des annonces "soleil" (Search)</label>
+          <input type="text" id="sunAdLabel" value="meteo-soleil">
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>Marqueur asset group "pluie" (PMax, dans le nom)</label>
+          <input type="text" id="rainAgMarker" value="[PLUIE]">
+        </div>
+        <div class="field">
+          <label>Marqueur asset group "soleil" (PMax, dans le nom)</label>
+          <input type="text" id="sunAgMarker" value="[SOLEIL]">
+        </div>
+      </div>
+      <div class="confidence-note">Fonctionnement : jour de pluie → les annonces/asset groups "pluie" sont activés et les "soleil" mis en pause (et inversement). Condition neutre → tout est réactivé. Setup requis : créer les deux libellés dans Google Ads et les appliquer aux annonces concernées; nommer les asset groups PMax avec le marqueur (ex: "Biodôme [PLUIE]"). Une annonce ou un asset group sans libellé/marqueur n'est JAMAIS touché (evergreen).</div>
+      <div class="warn-note">⚠️ Garde-fou intégré : le script n'appliquera JAMAIS une pause qui laisserait un groupe d'annonces sans aucune annonce active, ni une campagne PMax sans aucun asset group actif. Dans ce cas la pause est ignorée et un avertissement est journalisé. Ordre d'exécution : activations d'abord, pauses ensuite.</div>
     </div>
   </section>
 
   <!-- SECTION 6 -->
   <section>
-    <div class="section-head"><span class="section-num">06</span><h2>Avant d'activer — checklist Alexandre</h2></div>
+    <div class="section-head"><span class="section-num">06</span><h2>Générer le Google Ads Script</h2></div>
+    <p class="section-desc">Le script est pensé pour tourner tôt le matin (5h-7h) via le planificateur natif de Google Ads Scripts, pour que les baisses de budget prennent effet avant que la plateforme n'ait dépensé au maximum de la journée. V2 : mode Preview respecté (isPreview = aucune écriture, journal seulement).</p>
+    <div class="card">
+      <button class="btn-primary" id="genBtn">Générer le script</button>
+      <button class="btn-secondary" id="copyBtn">Copier</button>
+      <div id="genStatus"></div>
+      <pre id="scriptOut">// Configure la matrice ci-dessus, puis clique "Générer le script".</pre>
+    </div>
+  </section>
+
+  <!-- SECTION 7 -->
+  <section>
+    <div class="section-head"><span class="section-num">07</span><h2>Avant d'activer : checklist Alexandre</h2></div>
     <div class="card">
       <ul class="checklist">
-        <li><span class="num">01</span>Vérifier la stratégie d'enchères de chaque campagne (Target CPA/ROAS = ajuster le target ; enchère manuelle = ajuster le budget) avant d'activer.</li>
-        <li><span class="num">02</span>Les baisses de budget doivent être poussées la veille au soir ou tôt le matin — sinon Google Ads dépense le montant max déjà atteint dans la journée.</li>
-        <li><span class="num">03</span>Sur PMax : pas de contrôle par mot-clé, mais le budget de campagne et le tROAS/tCPA restent ajustables via l'API — impact moins granulaire, à documenter dans le rapport client.</li>
-        <li><span class="num">04</span>Documenter chaque seuil ($ ou %) avant le lancement — Alexandre veut la matrice complète en main avant l'ETA.</li>
-        <li><span class="num">05</span>Garder un groupe témoin (hold-out) actif dès le jour 1 — sans lui, impossible de prouver que le script génère de la performance incrémentale plutôt que de suivre une demande qui serait arrivée pareil.</li>
-        <li><span class="num">06</span>Exclure les jours fériés, vacances scolaires et événements spéciaux (Jardins de lumière, etc.) — la météo n'y explique pas la demande, le signal serait faux.</li>
-        <li><span class="num">07</span>Espacer les changements de target CPA/ROAS (cooldown) — des changements trop fréquents remettent l'algorithme Smart Bidding en apprentissage permanent.</li>
+        <li><span class="num">01</span>Remplir la valeur de base de CHAQUE ligne de la matrice avec les vrais budgets/targets du compte : le script ignore toute ligne sans base (fail-safe).</li>
+        <li><span class="num">02</span>Vérifier la stratégie d'enchères de chaque campagne (Target CPA/ROAS = ajuster le target ; enchère manuelle ou Max Clicks = ajuster le budget) avant d'activer.</li>
+        <li><span class="num">03</span>Les baisses de budget doivent être poussées tôt le matin : sinon Google Ads dépense le montant max déjà atteint dans la journée.</li>
+        <li><span class="num">04</span>Sur PMax : pas de contrôle par mot-clé, mais budget de campagne, tROAS/tCPA et asset groups restent pilotables par script. Impact moins granulaire, à documenter dans le rapport client.</li>
+        <li><span class="num">05</span>Documenter chaque seuil ($ ou %) avant le lancement : Alexandre veut la matrice complète en main avant l'ETA.</li>
+        <li><span class="num">06</span>Garder un groupe témoin (hold-out) actif dès le jour 1 : sans lui, impossible de prouver que le script génère de la performance incrémentale plutôt que de suivre une demande qui serait arrivée pareil.</li>
+        <li><span class="num">07</span>Exclure les jours fériés, vacances scolaires et événements spéciaux (Jardins de lumière, etc.) : la météo n'y explique pas la demande, le signal serait faux.</li>
+        <li><span class="num">08</span>Espacer les changements de target CPA/ROAS (cooldown) : des changements trop fréquents remettent l'algorithme Smart Bidding en apprentissage permanent.</li>
+        <li><span class="num">09</span>Créatifs météo : valider le principe des pauses/activations automatiques avec Melissa/Alexandre AVANT d'activer le toggle (doctrine anti auto-pause). Créer les libellés meteo-pluie/meteo-soleil et les appliquer; nommer les asset groups PMax avec [PLUIE]/[SOLEIL].</li>
+        <li><span class="num">10</span>Toujours faire un Preview du script avant la première exécution planifiée : en Preview, la V2 journalise tout mais n'écrit rien.</li>
+        <li><span class="num">11</span>La matrice est la SOURCE DE VÉRITÉ des bases : tout changement volontaire de budget/target (client ou équipe) doit être reflété dans la matrice, puis le script régénéré. La garde de dérive bloque les écritures quand la réalité s'éloigne trop de la base, mais la discipline reste humaine.</li>
+        <li><span class="num">12</span>Sur un petit compte, préférer le hold-out manuel : appliquer le libellé wb-holdout sur 1-2 campagnes choisies (le % par hash peut tomber sur 0 campagne au hasard).</li>
       </ul>
     </div>
   </section>
 
-  <footer>SEM Command Center — Module Weather Bid Adjuster · Cossette Media · Tommy Dubé</footer>
+  <footer>SEM Command Center : Module Weather Bid Adjuster v2 · Cossette Media · Tommy Dubé</footer>
 </div>
 
 <script>
+// ============================================================
+// ÉTAT DE L'INTERFACE
+// ============================================================
 const SENSITIVITY = { sun: 'Augmente au beau temps', rain: 'Augmente à la pluie' };
+
 let rows = [
-  { name:'Jardin botanique', filter:'Jardin', sens:'sun', adjType:'budget', coldVal:'-25%', sunVal:'+30%', pmax:'oui' },
-  { name:'Biodôme', filter:'Biodome', sens:'rain', adjType:'budget', coldVal:'+30%', sunVal:'-20%', pmax:'oui' },
-  { name:'Planétarium', filter:'Planetarium', sens:'rain', adjType:'target', coldVal:'+20%', sunVal:'-15%', pmax:'non' },
+  { name:'Jardin botanique', filter:'Jardin',      sens:'sun',  adjType:'budget', baseVal:'100', coldVal:'-25%', sunVal:'+30%', pmax:'oui' },
+  { name:'Biodôme',          filter:'Biodome',     sens:'rain', adjType:'budget', baseVal:'100', coldVal:'+30%', sunVal:'-20%', pmax:'oui' },
+  { name:'Biosphère',        filter:'Biosphere',   sens:'rain', adjType:'budget', baseVal:'80',  coldVal:'+30%', sunVal:'-20%', pmax:'non' },
+  { name:'Planétarium',      filter:'Planetarium', sens:'rain', adjType:'target', baseVal:'15',  coldVal:'+20%', sunVal:'-15%', pmax:'non' },
 ];
 
 let blackouts = [
   { label:'Jardins de lumière', start:'2026-12-01', end:'2027-01-11' },
-  { label:'Fête du Travail', start:'2026-09-07', end:'' },
+  { label:'Fête du Travail',    start:'2026-09-07', end:'' },
 ];
 
-function renderBlackouts(){
-  const body = document.getElementById('blackoutBody');
-  body.innerHTML = blackouts.map((b,i)=>`
-    <tr data-i="${i}">
-      <td><input type="text" value="${b.label}" data-f="label" placeholder="ex: Congé scolaire"></td>
-      <td><input type="date" value="${b.start}" data-f="start"></td>
-      <td><input type="date" value="${b.end}" data-f="end"></td>
-      <td><button class="del-btn" data-del="${i}">✕</button></td>
-    </tr>
-  `).join('');
-
-  body.querySelectorAll('input').forEach(el=>{
-    el.addEventListener('input', e=>{
-      const tr = e.target.closest('tr');
-      const i = +tr.dataset.i;
-      blackouts[i][e.target.dataset.f] = e.target.value;
-    });
-  });
-  body.querySelectorAll('[data-del]').forEach(btn=>{
-    btn.addEventListener('click', e=>{
-      blackouts.splice(+e.target.dataset.del, 1);
-      renderBlackouts();
-    });
-  });
+// Échappement pour attributs HTML (évite de casser le rendu si l'usager tape des guillemets)
+function esc(s){
+  return String(s == null ? '' : s)
+    .replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;')
+    .replaceAll('"','&quot;').replaceAll("'",'&#39;');
 }
-
-document.getElementById('addBlackout').addEventListener('click', ()=>{
-  blackouts.push({ label:'', start:'', end:'' });
-  renderBlackouts();
-});
+// Échappement pour insertion dans une string JS double-quotée du script généré
+function jsEsc(s){
+  return String(s == null ? '' : s)
+    .replaceAll('\\','\\\\').replaceAll('"','\\"')
+    .replaceAll('\n',' ').replaceAll('\r',' ');
+}
 
 function renderRadar(){
   const days = ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
   const strip = document.getElementById('radarStrip');
-  strip.innerHTML = days.map((d,i)=>{
+  strip.innerHTML = days.map((d)=>{
     const isLookahead = (d==='Jeu' || d==='Ven');
     const isTarget = (d==='Sam' || d==='Dim');
     const icon = isTarget ? '☀' : (isLookahead ? '👁' : '·');
@@ -390,8 +460,8 @@ function renderMatrix(){
   const body = document.getElementById('matrixBody');
   body.innerHTML = rows.map((r,i)=>`
     <tr data-i="${i}">
-      <td><input type="text" value="${r.name}" data-f="name"></td>
-      <td><input type="text" value="${r.filter}" data-f="filter"></td>
+      <td><input type="text" value="${esc(r.name)}" data-f="name"></td>
+      <td><input type="text" value="${esc(r.filter)}" data-f="filter"></td>
       <td>
         <select data-f="sens">
           <option value="sun" ${r.sens==='sun'?'selected':''}>☀ ${SENSITIVITY.sun}</option>
@@ -404,8 +474,9 @@ function renderMatrix(){
           <option value="target" ${r.adjType==='target'?'selected':''}>Target CPA/ROAS</option>
         </select>
       </td>
-      <td><input type="text" value="${r.coldVal}" data-f="coldVal" placeholder="ex: +30% ou 150$"></td>
-      <td><input type="text" value="${r.sunVal}" data-f="sunVal" placeholder="ex: -20%"></td>
+      <td><input type="text" value="${esc(r.baseVal)}" data-f="baseVal" placeholder="requis"></td>
+      <td><input type="text" value="${esc(r.coldVal)}" data-f="coldVal" placeholder="ex: +30%"></td>
+      <td><input type="text" value="${esc(r.sunVal)}" data-f="sunVal" placeholder="ex: -20%"></td>
       <td>
         <select data-f="pmax">
           <option value="oui" ${r.pmax==='oui'?'selected':''}>Oui</option>
@@ -431,20 +502,97 @@ function renderMatrix(){
   });
 }
 
+function renderBlackouts(){
+  const body = document.getElementById('blackoutBody');
+  body.innerHTML = blackouts.map((b,i)=>`
+    <tr data-i="${i}">
+      <td><input type="text" value="${esc(b.label)}" data-f="label" placeholder="ex: Congé scolaire"></td>
+      <td><input type="date" value="${esc(b.start)}" data-f="start"></td>
+      <td><input type="date" value="${esc(b.end)}" data-f="end"></td>
+      <td><button class="del-btn" data-del="${i}">✕</button></td>
+    </tr>
+  `).join('');
+
+  body.querySelectorAll('input').forEach(el=>{
+    el.addEventListener('input', e=>{
+      const tr = e.target.closest('tr');
+      const i = +tr.dataset.i;
+      blackouts[i][e.target.dataset.f] = e.target.value;
+    });
+  });
+  body.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      blackouts.splice(+e.target.dataset.del, 1);
+      renderBlackouts();
+    });
+  });
+}
+
 document.getElementById('addRow').addEventListener('click', ()=>{
-  rows.push({ name:'Nouvelle campagne', filter:'', sens:'sun', adjType:'budget', coldVal:'-10%', sunVal:'+10%', pmax:'non' });
+  rows.push({ name:'Nouvelle campagne', filter:'', sens:'sun', adjType:'budget', baseVal:'', coldVal:'-10%', sunVal:'+10%', pmax:'non' });
   renderMatrix();
 });
 
+// Ville: un préréglage remplit lat/lon; une édition manuelle passe en mode personnalisé
+document.getElementById('citySelect').addEventListener('change', (e)=>{
+  const v = e.target.value;
+  if (v === 'custom') return;
+  const parts = v.split('|');
+  document.getElementById('latInput').value = parts[0];
+  document.getElementById('lonInput').value = parts[1];
+});
+['latInput','lonInput'].forEach(id=>{
+  document.getElementById(id).addEventListener('input', ()=>{
+    document.getElementById('citySelect').value = 'custom';
+  });
+});
+document.getElementById('addBlackout').addEventListener('click', ()=>{
+  blackouts.push({ label:'', start:'', end:'' });
+  renderBlackouts();
+});
+
+// ============================================================
+// VALIDATION AVANT GÉNÉRATION
+// ============================================================
+function validateConfig(){
+  const warnings = [];
+  rows.forEach((r, i)=>{
+    const line = 'Ligne ' + (i+1) + ' (' + (r.name || 'sans nom') + ')';
+    if (!r.filter || !r.filter.trim()) warnings.push(line + ' : filtre de nom vide, la ligne sera ignorée par le script.');
+    const base = parseFloat(String(r.baseVal).replace(',', '.'));
+    if (!(base > 0)) warnings.push(line + ' : valeur de base manquante ou invalide, la ligne sera ignorée par le script (fail-safe).');
+  });
+  const seen = {};
+  rows.forEach((r)=>{
+    if (r.filter && seen[r.filter]) warnings.push('Filtre "' + r.filter + '" utilisé sur plusieurs lignes : les campagnes correspondantes recevront plusieurs règles.');
+    if (r.filter) seen[r.filter] = true;
+  });
+  return warnings;
+}
+
+// ============================================================
+// GÉNÉRATION DU GOOGLE ADS SCRIPT (V2)
+// ============================================================
 function generateScript(){
-  const provider = document.getElementById('provider').value;
   const weekend = document.getElementById('weekendToggle').checked;
   const thuWeight = document.getElementById('thuWeight').value;
   const friWeight = document.getElementById('friWeight').value;
-  const coords = document.getElementById('cityCoords').value;
-  const coordsMatch = coords.match(/(-?\d+\.?\d*)\s*,\s*(-?\d+\.?\d*)/);
-  const lat = coordsMatch ? coordsMatch[1] : "45.5019";
-  const lon = coordsMatch ? coordsMatch[2] : "-73.5674";
+  const citySel = document.getElementById('citySelect').value;
+  const lat = parseFloat(document.getElementById('latInput').value);
+  const lon = parseFloat(document.getElementById('lonInput').value);
+  const cityLabel = citySel === 'custom' ? 'Coordonnées personnalisées' : citySel.split('|')[2];
+  const coords = cityLabel + ' (' + lat + ', ' + lon + ')';
+
+  // Coordonnées invalides = on BLOQUE la génération (aucun fallback silencieux)
+  const coordsValid = !isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
+  if (!coordsValid) {
+    document.getElementById('genStatus').innerHTML = '<div class="warn">⚠ Coordonnées invalides (latitude -90 à 90, longitude -180 à 180). Corrige la section 01 puis régénère.</div>';
+    document.getElementById('scriptOut').textContent = '// Coordonnées invalides: corrige la section 01 (Source météo) puis clique de nouveau sur "Générer le script".';
+    return null;
+  }
+
+  const warmTemp = document.getElementById('warmTemp').value;
+  const coldTemp = document.getElementById('coldTemp').value;
   const holdoutPct = document.getElementById('holdoutPct').value;
   const hardCap = document.getElementById('hardCap').value;
   const targetCooldown = document.getElementById('targetCooldown').value;
@@ -452,88 +600,208 @@ function generateScript(){
     .filter(b => b.start)
     .map(b => b.end ? (b.start + ":" + b.end) : b.start);
   const logSheetUrl = document.getElementById('logSheetUrl').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const notifyEmail = document.getElementById('notifyEmail').value.trim();
+  const creativeOn = document.getElementById('creativeToggle').checked;
+  const rainAdLabel = document.getElementById('rainAdLabel').value.trim();
+  const sunAdLabel = document.getElementById('sunAdLabel').value.trim();
+  const rainAgMarker = document.getElementById('rainAgMarker').value.trim();
+  const sunAgMarker = document.getElementById('sunAgMarker').value.trim();
 
-  const matrixJs = rows.map(r=>`  {
-    name: "${r.name}",
-    campaignNameContains: "${r.filter}",
-    sensitivity: "${r.sens}", // 'sun' = augmente au beau temps, 'rain' = augmente à la pluie
-    adjustmentType: "${r.adjType}", // 'budget' ou 'target'
-    coldOrRainValue: "${r.coldVal}",
-    sunValue: "${r.sunVal}",
-    isPMax: ${r.pmax === 'oui'}
-  }`).join(',\n');
+  // Validation UI
+  const warnings = validateConfig();
+  if (!apiKey) warnings.push('Clé API non fournie : remplacer COLLE_TA_CLE_ICI dans le script avant de le planifier.');
+  const statusEl = document.getElementById('genStatus');
+  statusEl.innerHTML = warnings.length
+    ? warnings.map(w=>'<div class="warn">⚠ ' + esc(w) + '</div>').join('')
+    : '<div class="ok">✓ Configuration valide, script généré.</div>';
+
+  const matrixJs = rows.map(r=>'  {\n' +
+    '    name: "' + jsEsc(r.name) + '",\n' +
+    '    campaignNameContains: "' + jsEsc(r.filter) + '",\n' +
+    '    sensitivity: "' + (r.sens === 'rain' ? 'rain' : 'sun') + '", // sun = augmente au beau temps, rain = augmente froid/pluie\n' +
+    '    adjustmentType: "' + (r.adjType === 'target' ? 'target' : 'budget') + '",\n' +
+    '    baseValue: ' + (parseFloat(String(r.baseVal).replace(',', '.')) > 0 ? parseFloat(String(r.baseVal).replace(',', '.')) : 'null') + ', // budget quotidien $ ou target (tCPA $ / tROAS)\n' +
+    '    coldOrRainValue: "' + jsEsc(r.coldVal) + '",\n' +
+    '    sunValue: "' + jsEsc(r.sunVal) + '",\n' +
+    '    isPMax: ' + (r.pmax === 'oui') + '\n' +
+    '  }').join(',\n');
+
+  const blackoutHuman = blackouts.filter(b=>b.start)
+    .map(b => (b.label || '(sans nom)') + ' -> ' + b.start + (b.end ? ' a ' + b.end : ''))
+    .join(' | ');
 
   const script = `/**
- * Weather Bid Adjuster — Espace pour la vie
- * Généré par le Weather Bid Command Center (module Signal QC)
- * Fournisseur météo: ${provider === 'owm' ? 'OpenWeatherMap' : 'Environnement Canada MSC GeoMet'}
- * Coordonnées: ${coords}
+ * Weather Bid Adjuster V2 : Espace pour la vie
+ * Genere par le Weather Bid Command Center (module Signal QC)
+ * Fournisseur meteo: OpenWeatherMap (forecast 5 jours / blocs 3h)
+ * Coordonnees: ${jsEsc(coords)}
  *
- * ⚠️ À PLANIFIER via le scheduler natif de Google Ads Scripts, tôt le matin (5h-7h),
- *    AVANT que Google Ads calcule la dépense max de la journée.
- *    Une baisse de budget appliquée en cours de journée n'a aucun effet rétroactif
- *    sur le plafond déjà atteint.
+ * NOUVEAUTES V2 (audit complet):
+ *  1. Ajustements calcules depuis une VALEUR DE BASE fixe: aucun effet cumulatif,
+ *     retour automatique a la base en condition neutre.
+ *  2. Support PMax reel via AdsApp.performanceMaxCampaigns()
+ *     (AdsApp.campaigns() ne retourne PAS les campagnes PMax).
+ *  3. Targets ajustes via campaign.bidding().getTargetCpa()/setTargetCpa() et
+ *     getTargetRoas()/setTargetRoas() (l'ancien getStrategy() retournait null
+ *     sur les strategies standards non-portfolio).
+ *  4. Neige/bruine/orage detectes comme mauvais temps + seuil de froid configurable.
+ *  5. Jour de la semaine calcule dans le fuseau America/Montreal.
+ *  6. Blackout applique aussi aux jours CIBLES par la prevision.
+ *  7. Cooldown target: prend la date la PLUS RECENTE des labels et nettoie les anciens.
+ *  8. Mode Preview respecte: isPreview() = journal seulement, aucune ecriture.
+ *  9. Rotation creative meteo (annonces par libelle + asset groups PMax),
+ *     avec garde-fou "jamais 0 annonce/asset group actif".
+ *
+ * A PLANIFIER via le scheduler natif de Google Ads Scripts, tot le matin (5h-7h),
+ * AVANT que Google Ads calcule la depense max de la journee.
  */
 
-const API_KEY = "COLLE_TA_CLE_ICI"; // ne jamais committer la clé en clair
-const LOCATION = "${coords}";
-const LOCATION_LAT = "${lat}";
-const LOCATION_LON = "${lon}";
-const WEEKEND_ANTICIPATION_ENABLED = ${weekend};
-const THURSDAY_CONFIDENCE_WEIGHT = ${thuWeight} / 100; // prévision J+2/J+3, plus incertaine
-const FRIDAY_CONFIDENCE_WEIGHT = ${friWeight} / 100;   // prévision J+1/J+2, plus fiable
+// ------------------------------------------------------------------
+// CONFIGURATION
+// ------------------------------------------------------------------
+const API_KEY = "${jsEsc(apiKey) || 'COLLE_TA_CLE_ICI'}"; // collee UNE fois: le script planifie la garde. Ne jamais committer en clair.
+const LOCATION_LABEL = "${jsEsc(coords)}";
+const LOCATION_LAT = "${jsEsc(lat)}";
+const LOCATION_LON = "${jsEsc(lon)}";
+const TIMEZONE = "America/Montreal";
 
-// --- GARDE-FOUS (l'harmonie) ---
-const HOLDOUT_PERCENTAGE = ${holdoutPct};   // % de campagnes gardées comme groupe témoin, jamais touchées
-const HARD_CAP_PERCENT = ${hardCap};        // plafond dur, peu importe le calcul (évite l'emballement)
-const TARGET_CHANGE_COOLDOWN_DAYS = ${targetCooldown}; // délai min. entre 2 changements de target (stabilité Smart Bidding)
-const BLACKOUT_PERIODS = ${JSON.stringify(blackoutRaw)}; // jours fériés / vacances / événements — aucun ajustement météo là-dessus
-// Référence lisible: ${blackouts.filter(b=>b.start).map(b=>`${b.label||'(sans nom)'} → ${b.start}${b.end?' à '+b.end:''}`).join(' · ')}
-const LOG_SHEET_URL = "${logSheetUrl}"; // optionnel: URL d'une Google Sheet pour un journal exploitable par le client
+const WARM_TEMP_C = ${Number(warmTemp) || 20};  // >= et sans pluie = "sun"
+const COLD_TEMP_C = ${Number(coldTemp) || 5};   // <  = traite comme "rain" (froid, plan B interieur)
+
+const WEEKEND_ANTICIPATION_ENABLED = ${weekend};
+const THURSDAY_CONFIDENCE_WEIGHT = ${Number(thuWeight) || 60} / 100; // prevision J+2/J+3, plus incertaine
+const FRIDAY_CONFIDENCE_WEIGHT = ${Number(friWeight) || 90} / 100;   // prevision J+1/J+2, plus fiable
+
+// --- GARDE-FOUS ---
+const HOLDOUT_PERCENTAGE = ${Number(holdoutPct) || 0};
+const HARD_CAP_PERCENT = ${Number(hardCap) || 40};
+const TARGET_CHANGE_COOLDOWN_DAYS = ${Number(targetCooldown) || 7};
+const MIN_CHANGE_PERCENT = 1; // sous ce delta, on n'ecrit pas (evite le bruit)
+const BLACKOUT_PERIODS = ${JSON.stringify(blackoutRaw)};
+// Reference lisible: ${jsEsc(blackoutHuman)}
+const LOG_SHEET_URL = "${jsEsc(logSheetUrl)}";
+const NOTIFY_EMAIL = "${jsEsc(notifyEmail)}"; // optionnel: resume par courriel quand le script agit
+const MANUAL_HOLDOUT_LABEL = "wb-holdout"; // appliquer ce libelle a une campagne = jamais touchee
+// Garde de derive: si la valeur ACTUELLE s'eloigne trop de la base de la matrice,
+// on n'ecrit rien (base perimee, mauvaise unite tROAS, ou changement manuel du client).
+const MAX_BASE_DRIFT_PERCENT = HARD_CAP_PERCENT + 15;
+const ACTION_SUMMARY = [];
+
+// --- CREATIFS METEO ---
+const CREATIVE_ROTATION_ENABLED = ${creativeOn};
+const RAIN_AD_LABEL = "${jsEsc(rainAdLabel)}";
+const SUN_AD_LABEL = "${jsEsc(sunAdLabel)}";
+const RAIN_AG_MARKER = "${jsEsc(rainAgMarker)}";
+const SUN_AG_MARKER = "${jsEsc(sunAgMarker)}";
 
 const CAMPAIGN_RULES = [
 ${matrixJs}
 ];
 
+// ------------------------------------------------------------------
+// POINT D'ENTREE
+// ------------------------------------------------------------------
 function main() {
-  const today = new Date();
-  const dayOfWeek = today.getDay(); // 0=Dim ... 4=Jeu, 5=Ven
+  const preview = isPreviewRun();
+  if (preview) {
+    Logger.log("=== MODE PREVIEW: aucune ecriture ne sera appliquee, journal seulement. ===");
+  }
 
-  // --- Garde-fou: blackout (fériés, vacances, événements type Jardins de lumière) ---
-  if (isBlackoutDate(today, BLACKOUT_PERIODS)) {
-    Logger.log("📅 Date en période d'exclusion — aucun ajustement météo appliqué aujourd'hui.");
+  const todayIso = isoInTz(new Date());
+
+  // Garde-fou: blackout sur le jour d'execution
+  if (isBlackoutIso(todayIso)) {
+    Logger.log("Date " + todayIso + " en periode d'exclusion: aucun ajustement aujourd'hui.");
     return;
   }
 
+  // ---- 1) AJUSTEMENTS BUDGET / TARGET (prevision anticipee) ----
+  const dow = isoDayOfWeek(new Date()); // 1=Lun ... 4=Jeu, 5=Ven, 6=Sam, 7=Dim (fuseau du compte client)
   let forecast;
   let confidenceWeight = 1;
+  let targetOffsets;
 
-  if (WEEKEND_ANTICIPATION_ENABLED && dayOfWeek === 4) {
-    // Jeudi: on regarde la météo de samedi + dimanche
-    forecast = getWeekendForecast(2); // offset +2 jours = samedi
+  if (WEEKEND_ANTICIPATION_ENABLED && dow === 4) {
+    targetOffsets = [2, 3]; // jeudi -> samedi + dimanche
     confidenceWeight = THURSDAY_CONFIDENCE_WEIGHT;
-    Logger.log("Mode anticipation JEUDI — prévision week-end, poids " + confidenceWeight);
-  } else if (WEEKEND_ANTICIPATION_ENABLED && dayOfWeek === 5) {
-    // Vendredi: prévision week-end mise à jour, plus fiable
-    forecast = getWeekendForecast(1); // offset +1 jour = samedi
+    Logger.log("Mode anticipation JEUDI: prevision week-end, poids " + confidenceWeight);
+  } else if (WEEKEND_ANTICIPATION_ENABLED && dow === 5) {
+    targetOffsets = [1, 2]; // vendredi -> samedi + dimanche
     confidenceWeight = FRIDAY_CONFIDENCE_WEIGHT;
-    Logger.log("Mode anticipation VENDREDI — prévision week-end, poids " + confidenceWeight);
+    Logger.log("Mode anticipation VENDREDI: prevision week-end, poids " + confidenceWeight);
   } else {
-    // Jour normal: météo prévue pour demain
-    forecast = getTomorrowForecast();
+    targetOffsets = [1]; // jour normal -> demain
     confidenceWeight = 1;
   }
 
-  Logger.log("Condition retenue: " + JSON.stringify(forecast));
+  // Blackout sur les jours CIBLES par la prevision
+  const targetIsos = targetOffsets.map(function(o) { return isoInTz(addDays(new Date(), o)); });
+  const blackoutTarget = targetIsos.filter(isBlackoutIso);
 
-  CAMPAIGN_RULES.forEach(function(rule) {
-    applyRuleToCampaigns(rule, forecast, confidenceWeight);
-  });
+  if (blackoutTarget.length > 0) {
+    Logger.log("Jour(s) cible(s) en exclusion (" + blackoutTarget.join(", ") + "): ajustements budget/target ignores aujourd'hui.");
+  } else {
+    if (targetOffsets.length === 2) {
+      forecast = combineWorstCase(
+        getForecastForOffsetDay(targetOffsets[0]),
+        getForecastForOffsetDay(targetOffsets[1])
+      );
+    } else {
+      forecast = getForecastForOffsetDay(targetOffsets[0]);
+    }
+    Logger.log("Condition retenue (jours cibles " + targetIsos.join("+") + "): " + JSON.stringify(forecast));
+
+    CAMPAIGN_RULES.forEach(function(rule) {
+      applyRuleToCampaigns(rule, forecast, confidenceWeight, preview);
+    });
+  }
+
+  // ---- 2) CREATIFS METEO (meteo du jour meme) ----
+  if (CREATIVE_ROTATION_ENABLED) {
+    const todayForecast = getForecastForOffsetDay(0);
+    Logger.log("Rotation creative: condition du jour = " + JSON.stringify(todayForecast));
+    applyCreativeRotation(todayForecast.condition, preview);
+  }
+
+  // ---- 3) NOTIFICATION (resume des actions reelles) ----
+  if (NOTIFY_EMAIL && !preview && ACTION_SUMMARY.length > 0) {
+    try {
+      MailApp.sendEmail(
+        NOTIFY_EMAIL,
+        "Weather Bid: " + ACTION_SUMMARY.length + " action(s) appliquee(s)",
+        "Compte: " + LOCATION_LABEL + "\\nDate: " + todayIso + "\\n\\n" + ACTION_SUMMARY.join("\\n") +
+        "\\n\\nDetails complets dans les logs du script et la Google Sheet de journal."
+      );
+    } catch (e) {
+      Logger.log("Envoi du courriel de resume impossible (" + e.message + ").");
+    }
+  }
 }
 
-function isBlackoutDate(date, periods) {
-  const iso = Utilities.formatDate(date, "America/Montreal", "yyyy-MM-dd");
-  return periods.some(function(p) {
+// ------------------------------------------------------------------
+// DATES ET FUSEAU (les serveurs Google Ads Scripts tournent en heure du Pacifique:
+// on force America/Montreal via Utilities.formatDate pour tout calcul de calendrier)
+// ------------------------------------------------------------------
+function isPreviewRun() {
+  try { return AdsApp.getExecutionInfo().isPreview(); }
+  catch (e) { return false; }
+}
+
+function isoInTz(date) {
+  return Utilities.formatDate(date, TIMEZONE, "yyyy-MM-dd");
+}
+
+function isoDayOfWeek(date) {
+  return Number(Utilities.formatDate(date, TIMEZONE, "u")); // 1=Lundi ... 7=Dimanche
+}
+
+function addDays(date, n) {
+  return new Date(date.getTime() + n * 24 * 60 * 60 * 1000);
+}
+
+function isBlackoutIso(iso) {
+  return BLACKOUT_PERIODS.some(function(p) {
     if (p.indexOf(":") > -1) {
       const parts = p.split(":");
       return iso >= parts[0].trim() && iso <= parts[1].trim();
@@ -542,58 +810,64 @@ function isBlackoutDate(date, periods) {
   });
 }
 
-function getTomorrowForecast() {
-  return getForecastForOffsetDay(1);
-}
+// ------------------------------------------------------------------
+// METEO (OpenWeatherMap /data/2.5/forecast, gratuit, blocs 3h sur 5 jours)
+// ------------------------------------------------------------------
+let _forecastCache; // une seule requete API par execution (les offsets partagent la meme reponse 5 jours)
 
-function getWeekendForecast(offsetDays) {
-  // Agrège samedi ET dimanche — on retient le "pire cas" pluie/beau temps entre les deux jours,
-  // pour être prudent sur les week-ends mixtes (samedi pluvieux, dimanche ensoleillé, etc.)
-  const day1 = getForecastForOffsetDay(offsetDays);
-  const day2 = getForecastForOffsetDay(offsetDays + 1);
-  return combineWorstCase(day1, day2);
-}
-
-function getForecastForOffsetDay(offsetDays) {
+function getForecastData() {
+  if (_forecastCache !== undefined) return _forecastCache;
   const url = "https://api.openweathermap.org/data/2.5/forecast" +
     "?lat=" + LOCATION_LAT + "&lon=" + LOCATION_LON +
     "&appid=" + API_KEY + "&units=metric";
-
-  const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
-  if (response.getResponseCode() !== 200) {
-    Logger.log("⚠️ Appel météo échoué (code " + response.getResponseCode() + ") — traité comme neutre, aucun ajustement.");
-    return { condition: "neutral", tempC: null };
+  let response;
+  try {
+    response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
+  } catch (e) {
+    Logger.log("Appel meteo impossible (" + e.message + "): traite comme neutre, aucun ajustement.");
+    _forecastCache = null;
+    return null;
   }
+  if (response.getResponseCode() !== 200) {
+    Logger.log("Appel meteo echoue (code " + response.getResponseCode() + "): traite comme neutre, aucun ajustement.");
+    _forecastCache = null;
+    return null;
+  }
+  _forecastCache = JSON.parse(response.getContentText());
+  return _forecastCache;
+}
 
-  const data = JSON.parse(response.getContentText());
-  const targetDate = new Date();
-  targetDate.setDate(targetDate.getDate() + offsetDays);
-  const targetIso = Utilities.formatDate(targetDate, "America/Montreal", "yyyy-MM-dd");
+function getForecastForOffsetDay(offsetDays) {
+  const data = getForecastData();
+  if (!data) return { condition: "neutral", tempC: null };
+  const targetIso = isoInTz(addDays(new Date(), offsetDays));
 
-  // On ne garde que les blocs 3h de la journée ciblée, entre 9h et 18h
-  // (heures d'ouverture typiques des musées — la météo de nuit n'influence pas la visite).
+  // Blocs 3h de la journee ciblee, entre 9h et 18h (heures d'ouverture musees)
   const relevantBlocks = data.list.filter(function(block) {
-    const blockIso = Utilities.formatDate(new Date(block.dt * 1000), "America/Montreal", "yyyy-MM-dd");
-    const hour = Number(Utilities.formatDate(new Date(block.dt * 1000), "America/Montreal", "H"));
+    const blockDate = new Date(block.dt * 1000);
+    const blockIso = isoInTz(blockDate);
+    const hour = Number(Utilities.formatDate(blockDate, TIMEZONE, "H"));
     return blockIso === targetIso && hour >= 9 && hour <= 18;
   });
 
   if (relevantBlocks.length === 0) {
-    Logger.log("⚠️ Aucun bloc météo trouvé pour " + targetIso + " (hors de la fenêtre 5 jours de l'API gratuite) — traité comme neutre.");
+    Logger.log("Aucun bloc meteo pour " + targetIso + " (hors fenetre 5 jours?): traite comme neutre.");
     return { condition: "neutral", tempC: null };
   }
 
-  // Condition dominante: si au moins un bloc annonce de la pluie sur la plage 9h-18h, on considère "rain".
-  const hasRain = relevantBlocks.some(function(b) {
-    const main = b.weather[0].main.toLowerCase();
-    return main.indexOf("rain") > -1 || main.indexOf("drizzle") > -1 || main.indexOf("thunderstorm") > -1;
+  // Mauvais temps si au moins un bloc annonce pluie / bruine / orage / NEIGE (V2)
+  const hasPrecipitation = relevantBlocks.some(function(b) {
+    const main = String(b.weather[0].main).toLowerCase();
+    return main.indexOf("rain") > -1 || main.indexOf("drizzle") > -1 ||
+           main.indexOf("thunderstorm") > -1 || main.indexOf("snow") > -1 ||
+           main.indexOf("sleet") > -1;
   });
   const avgTemp = relevantBlocks.reduce(function(sum, b) { return sum + b.main.temp; }, 0) / relevantBlocks.length;
 
   let condition = "neutral";
-  if (hasRain) {
-    condition = "rain";
-  } else if (avgTemp >= 20) {
+  if (hasPrecipitation || avgTemp < COLD_TEMP_C) {
+    condition = "rain"; // "rain" = mauvais temps exterieur (pluie, neige OU froid)
+  } else if (avgTemp >= WARM_TEMP_C) {
     condition = "sun";
   }
 
@@ -601,82 +875,230 @@ function getForecastForOffsetDay(offsetDays) {
 }
 
 function combineWorstCase(day1, day2) {
-  // "Pire cas" pour une campagne sensible à la pluie: si un des deux jours a de la pluie, on traite le week-end comme pluvieux.
+  // Pire cas week-end: un seul jour de mauvais temps suffit a traiter le week-end comme "rain"
+  const temps = [day1.tempC, day2.tempC].filter(function(t) { return t !== null && !isNaN(t); });
   if (day1.condition === "rain" || day2.condition === "rain") {
-    return { condition: "rain", tempC: Math.min(day1.tempC || 99, day2.tempC || 99) };
+    return { condition: "rain", tempC: temps.length ? Math.min.apply(null, temps) : null };
   }
   if (day1.condition === "sun" && day2.condition === "sun") {
-    return { condition: "sun", tempC: Math.max(day1.tempC || 0, day2.tempC || 0) };
+    return { condition: "sun", tempC: temps.length ? Math.max.apply(null, temps) : null };
   }
-  return { condition: "neutral", tempC: (day1.tempC + day2.tempC) / 2 };
+  return { condition: "neutral", tempC: temps.length ? temps.reduce(function(a, b) { return a + b; }, 0) / temps.length : null };
 }
 
-function applyRuleToCampaigns(rule, forecast, confidenceWeight) {
-  const iterator = AdsApp.campaigns()
-    .withCondition("Name CONTAINS '" + rule.campaignNameContains + "'")
-    .get();
-
+// ------------------------------------------------------------------
+// SELECTION DES CAMPAGNES
+// AdsApp.campaigns() ne couvre que Search/Display: les PMax passent
+// obligatoirement par AdsApp.performanceMaxCampaigns().
+// Matching de nom fait en JS (indexOf) pour eviter toute fragilite de syntaxe
+// de requete et toute injection via apostrophes dans les noms.
+// ------------------------------------------------------------------
+function getCampaignsForRule(rule) {
+  const out = [];
+  if (!rule.campaignNameContains || !String(rule.campaignNameContains).trim()) {
+    Logger.log("Regle '" + rule.name + "': filtre de nom vide, regle ignoree (evite de matcher tout le compte).");
+    return out;
+  }
+  const iterator = rule.isPMax ? AdsApp.performanceMaxCampaigns().get() : AdsApp.campaigns().get();
   while (iterator.hasNext()) {
-    const campaign = iterator.next();
-
+    const c = iterator.next();
     try {
-      // --- Garde-fou: groupe témoin (hold-out) ---
-      // Assignation déterministe par ID de campagne (stable d'un jour à l'autre, pas aléatoire à chaque run)
+      if (!c.isEnabled()) continue;
+      if (String(c.getName()).indexOf(rule.campaignNameContains) === -1) continue;
+      out.push(c);
+    } catch (e) {
+      Logger.log("Lecture campagne impossible (" + e.message + "), campagne ignoree.");
+    }
+  }
+  return out;
+}
+
+// ------------------------------------------------------------------
+// APPLICATION DES REGLES BUDGET / TARGET
+// ------------------------------------------------------------------
+function applyRuleToCampaigns(rule, forecast, confidenceWeight, preview) {
+  const campaigns = getCampaignsForRule(rule);
+  if (campaigns.length === 0) {
+    Logger.log("Regle '" + rule.name + "': aucune campagne " + (rule.isPMax ? "PMax " : "") + "active ne contient '" + rule.campaignNameContains + "'.");
+    return;
+  }
+
+  campaigns.forEach(function(campaign) {
+    try {
+      // Garde-fou: hold-out MANUEL par libelle (prioritaire, utile sur petit compte)
+      if (hasLabel(campaign, MANUAL_HOLDOUT_LABEL)) {
+        Logger.log(campaign.getName() + " porte le libelle " + MANUAL_HOLDOUT_LABEL + ": jamais touchee (hold-out manuel).");
+        return;
+      }
+
+      // Garde-fou: groupe temoin (hold-out), assignation deterministe par ID
       if (isInHoldoutGroup(campaign.getId(), HOLDOUT_PERCENTAGE)) {
-        Logger.log("🔬 " + campaign.getName() + " = groupe témoin (hold-out) — aucun ajustement, sert de comparatif.");
+        Logger.log(campaign.getName() + " = groupe temoin (hold-out): aucun ajustement, sert de comparatif.");
         logAction(campaign.getName(), "HOLDOUT", "-", "-", forecast.condition);
-        continue;
+        return;
       }
 
-      // --- Vérification stratégie d'enchères (checklist Alexandre #1) ---
-      const biddingStrategyType = campaign.getBiddingStrategyType();
-      if (rule.adjustmentType === "target" &&
-          biddingStrategyType !== "TARGET_CPA" &&
-          biddingStrategyType !== "TARGET_ROAS") {
-        Logger.log("⚠️ " + campaign.getName() + " : stratégie '" + biddingStrategyType +
-          "' incompatible avec un ajustement de target. Passer en ajustement budget ou ignorer.");
-        continue;
-      }
-
-      // --- PMax (checklist Alexandre #3) ---
-      if (rule.isPMax) {
-        Logger.log(campaign.getName() + " est une campagne PMax — ajustement limité au budget/target de campagne (pas de granularité mot-clé).");
+      // Garde-fou: valeur de base obligatoire (sinon derive cumulative possible)
+      if (!(rule.baseValue > 0)) {
+        Logger.log(campaign.getName() + ": valeur de base absente dans la matrice, aucun ajustement (fail-safe).");
+        return;
       }
 
       const goesUp = (rule.sensitivity === "sun" && forecast.condition === "sun") ||
                      (rule.sensitivity === "rain" && forecast.condition === "rain");
       const goesDown = (rule.sensitivity === "sun" && forecast.condition === "rain") ||
-                        (rule.sensitivity === "rain" && forecast.condition === "sun");
+                       (rule.sensitivity === "rain" && forecast.condition === "sun");
 
-      let rawValue = null;
-      if (goesUp) rawValue = rule.sensitivity === "sun" ? rule.sunValue : rule.coldOrRainValue;
-      if (goesDown) rawValue = rule.sensitivity === "sun" ? rule.coldOrRainValue : rule.sunValue;
-      if (!rawValue) continue; // condition neutre, aucun ajustement
-
-      let weightedAdjustment = applyConfidenceWeight(rawValue, confidenceWeight);
-      weightedAdjustment = applyHardCap(weightedAdjustment, HARD_CAP_PERCENT);
+      let newValue;
+      if (!goesUp && !goesDown) {
+        // Condition neutre: RETOUR A LA BASE (self-healing, V2)
+        newValue = rule.baseValue;
+      } else {
+        const rawPalier = goesUp
+          ? (rule.sensitivity === "sun" ? rule.sunValue : rule.coldOrRainValue)
+          : (rule.sensitivity === "sun" ? rule.coldOrRainValue : rule.sunValue);
+        newValue = computeValueFromBase(rule.baseValue, rawPalier, confidenceWeight);
+        if (newValue === null) {
+          Logger.log(campaign.getName() + ": palier '" + rawPalier + "' illisible, aucun ajustement.");
+          return;
+        }
+      }
 
       if (rule.adjustmentType === "budget") {
-        adjustCampaignBudget(campaign, weightedAdjustment, forecast.condition);
+        applyBudget(campaign, newValue, rule.baseValue, forecast.condition, preview);
       } else {
-        // --- Garde-fou: cooldown avant de retoucher un target (stabilité Smart Bidding) ---
-        if (!isTargetCooldownElapsed(campaign, TARGET_CHANGE_COOLDOWN_DAYS)) {
-          Logger.log("⏳ " + campaign.getName() + " : cooldown target actif (< " + TARGET_CHANGE_COOLDOWN_DAYS + " jours depuis le dernier changement) — ignoré aujourd'hui.");
-          continue;
-        }
-        adjustCampaignTarget(campaign, weightedAdjustment, biddingStrategyType, forecast.condition);
+        applyTarget(campaign, newValue, rule.baseValue, forecast.condition, preview);
       }
     } catch (e) {
-      // --- Garde-fou: échec silencieux = ne RIEN faire, jamais de valeur par défaut dangereuse ---
-      Logger.log("🛑 Erreur sur " + campaign.getName() + " — aucun changement appliqué. Détail: " + e.message);
+      // Echec = ne RIEN faire, jamais de valeur par defaut dangereuse
+      Logger.log("Erreur sur " + campaign.getName() + ": aucun changement applique. Detail: " + e.message);
     }
+  });
+}
+
+// palier "%": valeur = base * (1 + palier * poids), plafonnee a +/- HARD_CAP_PERCENT
+// palier "$" fixe (ex: "150" ou "150$"): valeur absolue, poids et plafond non appliques (journalise)
+function computeValueFromBase(baseValue, rawPalier, weight) {
+  const s = String(rawPalier == null ? "" : rawPalier).trim();
+  if (!s) return null;
+  if (s.indexOf("%") > -1) {
+    let pct = parseFloat(s.replace(",", "."));
+    if (isNaN(pct)) return null;
+    pct = pct * weight;
+    pct = Math.max(Math.min(pct, HARD_CAP_PERCENT), -HARD_CAP_PERCENT);
+    return baseValue * (1 + pct / 100);
+  }
+  const fixed = parseFloat(s.replace("$", "").replace(",", "."));
+  if (isNaN(fixed) || fixed <= 0) return null;
+  Logger.log("Palier en valeur fixe (" + s + "): poids de confiance et plafond non appliques.");
+  return fixed;
+}
+
+function hasLabel(campaign, labelName) {
+  try {
+    const it = campaign.labels().get();
+    while (it.hasNext()) {
+      if (it.next().getName() === labelName) return true;
+    }
+  } catch (e) { /* labels illisibles: on n'exclut pas */ }
+  return false;
+}
+
+function baseDriftTooLarge(entityName, current, base) {
+  if (!(current > 0) || !(base > 0)) return false;
+  const driftPct = Math.abs(current - base) / base * 100;
+  if (driftPct > MAX_BASE_DRIFT_PERCENT) {
+    Logger.log(entityName + ": valeur actuelle (" + current + ") trop eloignee de la base de la matrice (" + base +
+      "), ecart " + driftPct.toFixed(0) + "% > " + MAX_BASE_DRIFT_PERCENT + "%. Aucune ecriture: verifier l'unite (tROAS?) ou mettre la matrice a jour.");
+    return true;
+  }
+  return false;
+}
+
+function applyBudget(campaign, newValue, baseValue, condition, preview) {
+  const budget = campaign.getBudget();
+  const current = budget.getAmount();
+  if (baseDriftTooLarge(campaign.getName(), current, baseValue)) return;
+  const deltaPct = current > 0 ? Math.abs(newValue - current) / current * 100 : 100;
+  if (deltaPct < MIN_CHANGE_PERCENT) {
+    Logger.log(campaign.getName() + ": budget deja au bon niveau (" + current.toFixed(2) + "), aucune ecriture.");
+    return;
+  }
+  if (preview) {
+    Logger.log("[PREVIEW] " + campaign.getName() + ": budget " + current.toFixed(2) + " -> " + newValue.toFixed(2));
+    return;
+  }
+  budget.setAmount(newValue);
+  logAction(campaign.getName(), "BUDGET", current.toFixed(2), newValue.toFixed(2), condition);
+}
+
+// V2: lecture directe des targets via campaign.bidding().getTargetCpa()/getTargetRoas().
+// (getStrategy() retourne null pour les strategies standards non-portfolio:
+//  l'ancien code plantait silencieusement sur la quasi-totalite des campagnes.)
+function applyTarget(campaign, newValue, baseValue, condition, preview) {
+  const bidding = campaign.bidding();
+
+  let currentCpa = null;
+  let currentRoas = null;
+  try { currentCpa = bidding.getTargetCpa(); } catch (e) { currentCpa = null; }
+  try { currentRoas = bidding.getTargetRoas(); } catch (e) { currentRoas = null; }
+
+  let kind = null;
+  let current = null;
+  if (typeof currentCpa === "number" && currentCpa > 0) {
+    kind = "TARGET_CPA"; current = currentCpa;
+  } else if (typeof currentRoas === "number" && currentRoas > 0) {
+    kind = "TARGET_ROAS"; current = currentRoas;
+  } else {
+    Logger.log(campaign.getName() + ": aucun target CPA/ROAS lisible (strategie '" + safeStrategyType(campaign) + "'). Passer cette ligne en ajustement budget.");
+    return;
+  }
+
+  // Garde de derive: protege surtout contre une base tROAS dans la mauvaise unite
+  // (ex: base 4 vs valeur API 400 = ecriture catastrophique) et les bases perimees.
+  if (baseDriftTooLarge(campaign.getName(), current, baseValue)) return;
+
+  const deltaPct = Math.abs(newValue - current) / current * 100;
+  if (deltaPct < MIN_CHANGE_PERCENT) {
+    Logger.log(campaign.getName() + ": " + kind + " deja au bon niveau (" + current + "), aucune ecriture.");
+    return;
+  }
+
+  // Garde-fou: cooldown Smart Bidding (label horodate, date la plus recente)
+  if (!isTargetCooldownElapsed(campaign)) {
+    Logger.log(campaign.getName() + ": cooldown target actif (< " + TARGET_CHANGE_COOLDOWN_DAYS + " jours): ignore aujourd'hui.");
+    return;
+  }
+
+  if (preview) {
+    Logger.log("[PREVIEW] " + campaign.getName() + ": " + kind + " " + current + " -> " + newValue);
+    return;
+  }
+
+  if (kind === "TARGET_CPA") {
+    bidding.setTargetCpa(newValue);
+  } else {
+    // Rappel: monter un tROAS = enchere PLUS restrictive. Le signe du palier
+    // doit avoir ete choisi en consequence dans la matrice.
+    bidding.setTargetRoas(newValue);
+  }
+  logAction(campaign.getName(), kind, String(current), String(newValue), condition);
+  stampTargetCooldown(campaign);
+}
+
+function safeStrategyType(campaign) {
+  try { return campaign.getBiddingStrategyType(); }
+  catch (e) {
+    try { return campaign.bidding().getStrategyType(); }
+    catch (e2) { return "inconnue"; }
   }
 }
 
+// ------------------------------------------------------------------
+// HOLD-OUT (hash stable de l'ID -> bucket 0-99)
+// ------------------------------------------------------------------
 function isInHoldoutGroup(campaignId, pct) {
   if (pct <= 0) return false;
-  // Hash simple et stable de l'ID -> bucket 0-99, pour que le même sous-ensemble
-  // de campagnes reste le groupe témoin d'un jour à l'autre (comparaison valide).
   const idStr = String(campaignId);
   let hash = 0;
   for (let i = 0; i < idStr.length; i++) {
@@ -685,94 +1107,206 @@ function isInHoldoutGroup(campaignId, pct) {
   return (hash % 100) < pct;
 }
 
-function applyHardCap(rawValue, capPct) {
-  if (rawValue.indexOf("%") === -1) return rawValue; // valeurs $ fixes non plafonnées ici
-  const num = parseFloat(rawValue);
-  const capped = Math.max(Math.min(num, capPct), -capPct);
-  return (capped >= 0 ? "+" : "") + capped.toFixed(1) + "%";
-}
+// ------------------------------------------------------------------
+// COOLDOWN TARGET (memoire par label horodate sur la campagne)
+// V2: prend la date LA PLUS RECENTE (l'ancien code prenait la derniere
+// dans l'ordre d'iteration, non garanti) et nettoie les vieux labels.
+// Si les labels sont illisibles (ex: PMax selon version API), on SKIP le
+// changement de target (fail-closed) plutot que de risquer un changement
+// trop frequent.
+// ------------------------------------------------------------------
+const COOLDOWN_LABEL_PREFIX = "weather-target-updated:";
 
-function isTargetCooldownElapsed(campaign, cooldownDays) {
-  // Utilise un label horodaté sur la campagne comme mémoire simple entre exécutions.
-  const labelPrefix = "weather-target-updated:";
-  const labels = campaign.labels().get();
-  let lastUpdate = null;
-  while (labels.hasNext()) {
-    const label = labels.next().getName();
-    if (label.indexOf(labelPrefix) === 0) {
-      lastUpdate = new Date(label.replace(labelPrefix, ""));
+function isTargetCooldownElapsed(campaign) {
+  let mostRecent = null;
+  try {
+    const labels = campaign.labels().get();
+    while (labels.hasNext()) {
+      const name = labels.next().getName();
+      if (name.indexOf(COOLDOWN_LABEL_PREFIX) === 0) {
+        const d = new Date(name.replace(COOLDOWN_LABEL_PREFIX, "") + "T12:00:00");
+        if (!isNaN(d.getTime()) && (mostRecent === null || d > mostRecent)) {
+          mostRecent = d;
+        }
+      }
     }
+  } catch (e) {
+    Logger.log(campaign.getName() + ": labels illisibles (" + e.message + "): changement de target ignore par prudence (fail-closed).");
+    return false;
   }
-  if (!lastUpdate) return true; // jamais ajusté -> ok d'y aller
-  const daysSince = (new Date() - lastUpdate) / (1000 * 60 * 60 * 24);
-  return daysSince >= cooldownDays;
+  if (mostRecent === null) return true; // jamais ajuste
+  const daysSince = (new Date() - mostRecent) / (1000 * 60 * 60 * 24);
+  return daysSince >= TARGET_CHANGE_COOLDOWN_DAYS;
 }
 
 function stampTargetCooldown(campaign) {
-  const labelPrefix = "weather-target-updated:";
-  const iso = Utilities.formatDate(new Date(), "America/Montreal", "yyyy-MM-dd");
-  const labelName = labelPrefix + iso;
-  if (!AdsApp.labels().withCondition("Name = '" + labelName + "'").get().hasNext()) {
-    AdsApp.createLabel(labelName);
+  try {
+    const iso = isoInTz(new Date());
+    const labelName = COOLDOWN_LABEL_PREFIX + iso;
+
+    // Nettoyage des anciens labels cooldown sur CETTE campagne
+    const labels = campaign.labels().get();
+    while (labels.hasNext()) {
+      const l = labels.next();
+      const name = l.getName();
+      if (name.indexOf(COOLDOWN_LABEL_PREFIX) === 0 && name !== labelName) {
+        try { campaign.removeLabel(name); } catch (e) { /* non bloquant */ }
+      }
+    }
+
+    if (!AdsApp.labels().withCondition("Name = '" + labelName + "'").get().hasNext()) {
+      AdsApp.createLabel(labelName);
+    }
+    campaign.applyLabel(labelName);
+  } catch (e) {
+    Logger.log(campaign.getName() + ": impossible d'horodater le cooldown (" + e.message + "). Surveiller manuellement la frequence des changements de target.");
   }
-  campaign.applyLabel(labelName);
 }
 
-function logAction(campaignName, action, oldVal, newVal, condition) {
-  Logger.log([new Date().toISOString(), campaignName, action, oldVal, newVal, condition].join(" | "));
-  // Si LOG_SHEET_URL est configuré, on pousse aussi une ligne dans la Sheet pour un rapport client lisible.
+// ------------------------------------------------------------------
+// JOURNAL
+// ------------------------------------------------------------------
+function logAction(entityName, action, oldVal, newVal, condition) {
+  Logger.log([new Date().toISOString(), entityName, action, oldVal, newVal, condition].join(" | "));
+  if (action !== "HOLDOUT") {
+    ACTION_SUMMARY.push(entityName + " | " + action + " | " + oldVal + " -> " + newVal + " | " + condition);
+  }
   if (LOG_SHEET_URL) {
     try {
-      const sheet = SpreadsheetApp.openByUrl(LOG_SHEET_URL).getSheetByName("Log") ||
-                    SpreadsheetApp.openByUrl(LOG_SHEET_URL).insertSheet("Log");
-      sheet.appendRow([new Date(), campaignName, action, oldVal, newVal, condition]);
+      const ss = SpreadsheetApp.openByUrl(LOG_SHEET_URL);
+      const sheet = ss.getSheetByName("Log") || ss.insertSheet("Log");
+      sheet.appendRow([new Date(), entityName, action, oldVal, newVal, condition]);
     } catch (e) {
-      Logger.log("Log Sheet inaccessible — log conservé dans Logger.log seulement.");
+      Logger.log("Log Sheet inaccessible: journal conserve dans Logger.log seulement.");
     }
   }
 }
 
-function applyConfidenceWeight(rawValue, weight) {
-  // Un ajustement "+30%" avec un poids de confiance de 0.6 devient "+18%"
-  if (rawValue.indexOf("%") > -1) {
-    const num = parseFloat(rawValue) * weight;
-    return (num >= 0 ? "+" : "") + num.toFixed(1) + "%";
+// ------------------------------------------------------------------
+// CREATIFS METEO (V2, nouveau)
+// Meteo du JOUR MEME (le message doit coller a la realite du visiteur).
+// Ordre: ACTIVATIONS d'abord, PAUSES ensuite (jamais 0 actif).
+// ------------------------------------------------------------------
+function applyCreativeRotation(condition, preview) {
+  // 1) Annonces Search par libelle
+  if (RAIN_AD_LABEL && SUN_AD_LABEL) {
+    if (condition === "rain") {
+      setLabeledAdsState(RAIN_AD_LABEL, true, preview);
+      setLabeledAdsState(SUN_AD_LABEL, false, preview);
+    } else if (condition === "sun") {
+      setLabeledAdsState(SUN_AD_LABEL, true, preview);
+      setLabeledAdsState(RAIN_AD_LABEL, false, preview);
+    } else {
+      setLabeledAdsState(RAIN_AD_LABEL, true, preview);
+      setLabeledAdsState(SUN_AD_LABEL, true, preview);
+    }
   }
-  return rawValue; // valeurs en $ fixes: appliquées telles quelles (à raffiner si besoin)
+
+  // 2) Asset groups PMax par marqueur de nom, sur les campagnes PMax de la matrice
+  if (RAIN_AG_MARKER && SUN_AG_MARKER) {
+    CAMPAIGN_RULES.filter(function(r) { return r.isPMax; }).forEach(function(rule) {
+      getCampaignsForRule(rule).forEach(function(campaign) {
+        rotateAssetGroups(campaign, condition, preview);
+      });
+    });
+  }
 }
 
-function adjustCampaignBudget(campaign, adjustment, condition) {
-  const currentBudget = campaign.getBudget().getAmount();
-  let newBudget = currentBudget;
-  if (adjustment.indexOf("%") > -1) {
-    const pct = parseFloat(adjustment) / 100;
-    newBudget = currentBudget * (1 + pct);
-  } else {
-    newBudget = parseFloat(adjustment.replace("$", ""));
+function setLabeledAdsState(labelName, shouldEnable, preview) {
+  const labelIt = AdsApp.labels().withCondition("Name = '" + String(labelName).replace(/'/g, "") + "'").get();
+  if (!labelIt.hasNext()) {
+    Logger.log("Libelle '" + labelName + "' introuvable dans le compte: rotation Search ignoree pour ce libelle.");
+    return;
   }
-  campaign.getBudget().setAmount(newBudget);
-  logAction(campaign.getName(), "BUDGET", currentBudget.toFixed(2), newBudget.toFixed(2), condition);
+  const ads = labelIt.next().ads().get();
+  while (ads.hasNext()) {
+    const ad = ads.next();
+    try {
+      if (shouldEnable) {
+        if (!ad.isEnabled()) {
+          if (preview) { Logger.log("[PREVIEW] AD_ENABLE: " + adDesc(ad)); }
+          else { ad.enable(); logAction(adDesc(ad), "AD_ENABLE", "paused", "enabled", labelName); }
+        }
+      } else {
+        if (ad.isEnabled()) {
+          // Garde-fou: le groupe doit conserver au moins 1 annonce active
+          const group = ad.getAdGroup();
+          const enabledCount = group.ads().withCondition("Status = ENABLED").get().totalNumEntities();
+          if (enabledCount <= 1) {
+            Logger.log("Pause refusee (" + adDesc(ad) + "): derniere annonce active de son groupe. Ajouter une annonce evergreen ou la version meteo opposee.");
+            continue;
+          }
+          if (preview) { Logger.log("[PREVIEW] AD_PAUSE: " + adDesc(ad)); }
+          else { ad.pause(); logAction(adDesc(ad), "AD_PAUSE", "enabled", "paused", labelName); }
+        }
+      }
+    } catch (e) {
+      Logger.log("Rotation impossible sur une annonce (" + e.message + "): annonce ignoree.");
+    }
+  }
 }
 
-function adjustCampaignTarget(campaign, adjustment, biddingStrategyType, condition) {
-  const pct = parseFloat(adjustment) / 100;
-  if (biddingStrategyType === "TARGET_CPA") {
-    const current = campaign.bidding().getStrategy().getTargetCpa();
-    const updated = current * (1 + pct);
-    campaign.bidding().getStrategy().setTargetCpa(updated);
-    logAction(campaign.getName(), "TARGET_CPA", current.toFixed(2), updated.toFixed(2), condition);
-    stampTargetCooldown(campaign);
-  } else if (biddingStrategyType === "TARGET_ROAS") {
-    const current = campaign.bidding().getStrategy().getTargetRoas();
-    const updated = current * (1 + pct); // attention: sens inverse pour ROAS selon l'objectif métier
-    campaign.bidding().getStrategy().setTargetRoas(updated);
-    logAction(campaign.getName(), "TARGET_ROAS", current.toFixed(3), updated.toFixed(3), condition);
-    stampTargetCooldown(campaign);
+function adDesc(ad) {
+  try { return ad.getCampaign().getName() + " > " + ad.getAdGroup().getName() + " > ad " + ad.getId(); }
+  catch (e) { return "ad " + ad.getId(); }
+}
+
+function rotateAssetGroups(pmaxCampaign, condition, preview) {
+  const groups = [];
+  try {
+    const it = pmaxCampaign.assetGroups().get();
+    while (it.hasNext()) { groups.push(it.next()); }
+  } catch (e) {
+    Logger.log(pmaxCampaign.getName() + ": asset groups inaccessibles (" + e.message + "): rotation PMax ignoree sur cette campagne.");
+    return;
   }
+
+  const rainGroups = groups.filter(function(g) { return String(g.getName()).indexOf(RAIN_AG_MARKER) > -1; });
+  const sunGroups = groups.filter(function(g) { return String(g.getName()).indexOf(SUN_AG_MARKER) > -1; });
+  if (rainGroups.length === 0 && sunGroups.length === 0) {
+    Logger.log(pmaxCampaign.getName() + ": aucun asset group marque " + RAIN_AG_MARKER + "/" + SUN_AG_MARKER + ": rotation PMax ignoree.");
+    return;
+  }
+
+  let toEnable, toPause;
+  if (condition === "rain") { toEnable = rainGroups; toPause = sunGroups; }
+  else if (condition === "sun") { toEnable = sunGroups; toPause = rainGroups; }
+  else { toEnable = rainGroups.concat(sunGroups); toPause = []; }
+
+  // Activations d'abord
+  toEnable.forEach(function(g) {
+    try {
+      if (!g.isEnabled()) {
+        if (preview) { Logger.log("[PREVIEW] AG_ENABLE: " + pmaxCampaign.getName() + " > " + g.getName()); }
+        else { g.enable(); logAction(pmaxCampaign.getName() + " > " + g.getName(), "AG_ENABLE", "paused", "enabled", condition); }
+      }
+    } catch (e) {
+      Logger.log("Activation asset group impossible (" + e.message + ").");
+    }
+  });
+
+  // Pauses ensuite, avec garde-fou "au moins 1 asset group actif dans la campagne"
+  toPause.forEach(function(g) {
+    try {
+      if (!g.isEnabled()) return;
+      let enabledCount = 0;
+      const it2 = pmaxCampaign.assetGroups().get();
+      while (it2.hasNext()) { if (it2.next().isEnabled()) enabledCount++; }
+      if (enabledCount <= 1) {
+        Logger.log("Pause refusee (" + pmaxCampaign.getName() + " > " + g.getName() + "): dernier asset group actif de la campagne.");
+        return;
+      }
+      if (preview) { Logger.log("[PREVIEW] AG_PAUSE: " + pmaxCampaign.getName() + " > " + g.getName()); }
+      else { g.pause(); logAction(pmaxCampaign.getName() + " > " + g.getName(), "AG_PAUSE", "enabled", "paused", condition); }
+    } catch (e) {
+      Logger.log("Pause asset group impossible (" + e.message + ").");
+    }
+  });
 }
 `;
 
   document.getElementById('scriptOut').textContent = script;
+  return script;
 }
 
 document.getElementById('genBtn').addEventListener('click', generateScript);
